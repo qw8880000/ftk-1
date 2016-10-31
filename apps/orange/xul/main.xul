@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window value="main" x="0" y="0" w="$ww" h="$wh" attr="$FTK_ATTR_IGNORE_CLOSE|$FTK_ATTR_FULLSCREEN" bg_image[normal]="icons/paper.jpg">
+
+
+</window>
