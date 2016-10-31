@@ -61,6 +61,9 @@ typedef struct _ListPrivInfo
 	
 	void* listener_ctx;
 	FtkListener listener;
+
+    void* paint_listener_ctx;
+    FtkListPaintListener paint_listener;
 }PrivInfo;
 
 static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
@@ -118,56 +121,46 @@ static void ftk_list_destroy(FtkWidget* thiz)
 	return;
 }
 
+Ret ftk_list_set_paint_listener(FtkWidget* thiz, FtkListPaintListener listener, void* ctx)
+{
+	DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL, RET_FAIL);
+
+	priv->paint_listener_ctx = ctx;
+	priv->paint_listener = listener;
+
+	return RET_OK;
+}
+
 static Ret ftk_list_paint_row(FtkWidget* thiz, int visible_pos, int row, int visible)
 {
     int c = 0;
-	DECL_PRIV(thiz, priv);
+	DECL_PRIV0(thiz, priv);
     return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
 
-
-    if(visible)
-    {
-        for(c=0; c<ftk_list_get_cols_nr(thiz); c++) 
-        {
-            FtkWidget* cell = ftk_list_get_cell(thiz, row, c);
-            ftk_widget_set_visible(cell, 1);
-#if 0
-            if(priv->paint_listerner != NULL)
-            {
-                priv->paint_listerner(priv->listerner_ctx, visible_pos, row, c, cell);
-            }
-#endif
-        }
-
-
-        ftk_widget_set_insensitive(ftk_list_get_item(thiz, row), 0);
-    }
-    else
-    {
-        for(c=0; c<ftk_list_get_cols_nr(thiz); c++) 
-        {
-            FtkWidget* cell = ftk_list_get_cell(thiz, row, c);
-            ftk_widget_set_visible(cell, 0);
-            ftk_widget_set_text(cell, " ");
-        }
-
-        ftk_widget_set_insensitive(ftk_list_get_item(thiz, row), 1);
-    }
+    ftk_logi("%s\n", __func__);
 
     for(c=0; c<ftk_list_get_cols_nr(thiz); c++) 
     {
         FtkWidget* cell = ftk_list_get_cell(thiz, row, c);
 
+        ftk_widget_set_visible(cell, visible);
+
+        if(priv->paint_listener != NULL)
+        {
+            priv->paint_listener(thiz, priv->paint_listener_ctx, visible_pos, row, c, cell, visible);
+        }
     }
+
+    ftk_widget_set_insensitive(ftk_list_get_item(thiz, row), !visible);
 
     return RET_OK;
 }
 
-
 static Ret ftk_list_paint(FtkWidget* thiz, int visible_start, int visible_nr, int total)
 {
     int r = 0;
-	DECL_PRIV(thiz, priv);
+	DECL_PRIV0(thiz, priv);
 	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
     return_val_if_fail(visible_start < total || (visible_start == 0 && total == 0), RET_FAIL);
 
@@ -177,11 +170,11 @@ static Ret ftk_list_paint(FtkWidget* thiz, int visible_start, int visible_nr, in
     {
         if(visible_start + r < total)     
         {
-            ftk_list_render_ranks_paint_row(thiz, visible_start + r, r, 1);
+            ftk_list_paint_row(thiz, visible_start + r, r, 1);
         }
         else
         {
-            ftk_list_render_ranks_paint_row(thiz, visible_start + r, r, 0);
+            ftk_list_paint_row(thiz, visible_start + r, r, 0);
         }
     }
 
@@ -201,7 +194,7 @@ Ret ftk_list_update(FtkWidget* thiz)
         }
     }
 
-    /* ftk_list_render_paint(priv->render, NULL, priv->visible_start, priv->rows_nr, priv->total, 0, 0); */
+    ftk_list_paint(thiz, priv->visible_start, priv->rows_nr, priv->total);
 
     ftk_widget_invalidate(thiz);
 

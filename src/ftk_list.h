@@ -6,6 +6,8 @@
 
 FTK_BEGIN_DECLS
 
+typedef Ret (*FtkListPaintListener)(FtkWidget* thiz, void* ctx, int pos, int row, int col, FtkWidget* cell, int visible);
+
 FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int height);
 Ret ftk_list_update(FtkWidget* thiz);
 Ret ftk_list_page_prev(FtkWidget* thiz);
@@ -24,6 +26,7 @@ Ret ftk_list_set_cols_nr(FtkWidget* thiz, int nr);
 
 FtkWidget* ftk_list_get_item(FtkWidget* thiz, int row);
 FtkWidget* ftk_list_get_cell(FtkWidget* thiz, int row, int col);
+Ret ftk_list_set_paint_listener(FtkWidget* thiz, FtkListPaintListener listener, void* ctx);
 
 FTK_END_DECLS
 

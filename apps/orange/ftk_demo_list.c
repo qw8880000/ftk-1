@@ -37,36 +37,21 @@ enum{
 static void ftk_demo_list_clear(FtkWidget* win)
 {
     FtkWidget* list = ftk_widget_lookup(win, IDX_LIST);
-ftk_list_reset(list);
+    ftk_list_reset(list);
+}
+
+Ret demo_list_paint_row(FtkWidget* thiz, void* ctx, int pos, int row, int col, FtkWidget* cell, int visible)
+{
+    ftk_logi("%s, %d,%d,%d\n", __func__, pos, row, col);
+    return RET_OK;
 }
 
 static void ftk_demo_list_init(FtkWidget* win)
 {
-    int r = 0;
-    FtkListModelRanksInfo info = {0};
     FtkWidget* list = ftk_widget_lookup(win, IDX_LIST);
-    char temp[32] = {0};
 
-    for(r=0; r<17; r++)
-    {
-        info.row_index = r;
-        info.cell_index = 0;
-        info.text = "a";
-        ftk_list_model_add(ftk_list_get_model(list),(void*)&info);
-
-        info.row_index = r;
-        info.cell_index = 1;
-        snprintf(temp, sizeof(temp), "%d. hahah", r); 
-        info.text = temp;
-        ftk_list_model_add(ftk_list_get_model(list), (void*)&info);
-
-        info.row_index = r;
-        info.cell_index = 2;
-        info.text = "b";
-        ftk_list_model_add(ftk_list_get_model(list), (void*)&info);
-    }
-
-    ftk_list_update(list);
+    ftk_list_set_total(list, 10);
+    ftk_list_set_paint_listener(list, demo_list_paint_row, win);
 }
 
 static Ret ftk_demo_list_on_button_clicked(void* ctx, void* obj)
