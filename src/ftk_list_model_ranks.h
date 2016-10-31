@@ -5,20 +5,16 @@
 
 FTK_BEGIN_DECLS
 
-typedef struct _FtkListModelCell
+typedef struct _FtkListModelRanksInfo
 {
+    int row_index;
+    int cell_index;
     char* text;
-}FtkListModelCell;
-
-typedef struct _FtkListModelRow
-{
-    int cell_nr;
-    int current_cell;
-    FtkListModelCell* cells;
-}FtkListModelRow;
+}FtkListModelRanksInfo;
 
 FtkListModel* ftk_list_model_ranks_create(size_t init_nr);
 
 FTK_END_DECLS
 
 #endif   /* ----- #ifndef __FTK_LIST_MODEL_RANKS_H__ ----- */
+
