@@ -46,9 +46,9 @@
 
 typedef struct _ListPrivInfo
 {
-	int current;
-	int visible_nr;
-	int visible_start;
+	/* int current; */
+	/* int visible_nr; */
+	/* int visible_start; */
 	/* int item_height; */
 
 	/* int is_active; */
@@ -59,9 +59,11 @@ typedef struct _ListPrivInfo
 	/* FtkListRender* render; */
 	/* FtkWidget* vscroll_bar; */
 	
-	/* FtkBitmap* bg_normal; */
-	/* FtkBitmap* bg_focus; */
-	/* FtkBitmap* bg_active; */
+    /* FtkBitmap* bg_normal; */
+    /* FtkBitmap* bg_focus; */
+    /* FtkBitmap* bg_active; */
+    int item_nr;
+
 
 	void* listener_ctx;
 	FtkListener listener;

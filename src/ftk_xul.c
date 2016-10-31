@@ -524,6 +524,24 @@ static FtkWidget* ftk_xul_text_view_create(FtkWidgetCreateInfo* info)
     return widget;
 }
 
+static FtkWidget* ftk_xul_list_create(FtkWidgetCreateInfo* info)
+{
+    FtkWidget* widget = NULL;
+
+    widget = ftk_list_create(info->parent, info->x, info->y, info->w, info->h);
+
+    return widget;
+}
+
+static FtkWidget* ftk_xul_list_item_create(FtkWidgetCreateInfo* info)
+{
+    FtkWidget* widget = NULL;
+
+    widget = ftk_list_item_create(info->parent, info->x, info->y, info->w, info->h);
+
+    return widget;
+}
+
 static const WidgetCreator s_widget_creaters[] = 
 {
 	{"label",              ftk_xul_label_create,               1},
@@ -551,6 +569,8 @@ static const WidgetCreator s_widget_creaters[] =
     {"tab",                ftk_xul_tab_create,                 1},
     {"page",               ftk_xul_page_create,                1},
     {"text_view",          ftk_xul_text_view_create,           1},
+    {"list",               ftk_xul_list_create,                1},
+    {"list_item",          ftk_xul_list_item_create,           1},
 	{NULL, NULL},
 };
 
