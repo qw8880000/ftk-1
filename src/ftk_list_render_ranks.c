@@ -40,6 +40,7 @@
 /* ----------------------------------------------------------------------------*/
 #include "ftk_log.h"
 #include "ftk_util.h"
+#include "ftk_widget.h"
 #include "ftk_globals.h"
 #include "ftk_list_model_ranks.h"
 #include "ftk_list_render_ranks.h"
@@ -61,9 +62,50 @@ static Ret ftk_list_render_ranks_init(FtkListRender* thiz, FtkListModel* model, 
 	return RET_OK;
 }
 
-static Ret ftk_list_render_ranks_paint(FtkListRender* thiz, FtkCanvas* canvas, int pos, int x, int y, int w, int h)
+static Ret ftk_list_render_ranks_paint(FtkListRender* thiz, FtkCanvas* canvas, int visible_start, int visible_nr, int y, int w, int h)
 {
 	DECL_PRIV(thiz, priv);
+    FtkWidget* list = priv->list;
+    FtkListModel* model = priv->model;
+    FtkWidget* row = NULL;
+    FtkWidget* cell = NULL;
+    int r = 0;
+    int c = 0;
+    int total = ftk_list_model_get_total(model);
+
+	return_val_if_fail(priv != NULL && model != NULL && list != NULL, RET_FAIL);
+    return_val_if_fail(visible_start >= total, RET_FAIL);
+
+    r = 0;
+    for(row = ftk_widget_child(list); row != NULL; row = ftk_widget_next(row))
+    {
+        if(ftk_widget_type(row) != FTK_LIST_ITEM) 
+        {
+            continue;
+        }
+
+        if(visible_start + r >= total)
+        {
+            ftk_widget_set_visible(row, 0);
+        }
+        else
+        {
+            c = 0;
+            for(cell = ftk_widget_child(row); cell != NULL; cell = ftk_widget_next(cell))
+            {
+                const char* text = ftk_list_model_ranks_get_text(model, r, c);
+
+                if(text != NULL)
+                {
+                    ftk_widget_set_text(cell, text);
+                }
+
+                c++;
+            }
+        }
+
+        r++;
+    }
 	
 	return RET_OK;
 }

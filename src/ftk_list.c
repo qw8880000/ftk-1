@@ -48,7 +48,7 @@
 
 typedef struct _ListPrivInfo
 {
-	/* int current; */
+    int current;
     int visible_nr;
     int visible_start;
 	/* int item_height; */
@@ -102,9 +102,25 @@ static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
 static Ret ftk_list_on_paint(FtkWidget* thiz)
 {
 	DECL_PRIV0(thiz, priv);
-	/* FTK_BEGIN_PAINT(x, y, width, height, canvas); */
-	/* FTK_END_PAINT(); */
-    return RET_OK;
+	int total = ftk_list_model_get_total(priv->model);
+    int i = 0;
+
+    FTK_BEGIN_PAINT(x, y, width, height, canvas);
+
+    if((priv->visible_start + priv->visible_nr) >= total)
+    {
+        int visible_start = total - priv->visible_nr;
+        priv->visible_start = (visible_start >= 0) ? visible_start : 0;
+    }
+
+	if(priv->current >= total)
+	{
+		priv->current = total - 1;
+	}
+
+    ftk_list_render_paint(priv->render, canvas, priv->visible_start, priv->visible_nr, 0, 0, 0);
+
+    FTK_END_PAINT();
 }
 
 static void ftk_list_destroy(FtkWidget* thiz)
@@ -114,6 +130,8 @@ static void ftk_list_destroy(FtkWidget* thiz)
 		DECL_PRIV0(thiz, priv);
 
         ftk_list_model_unref(priv->model);
+        ftk_list_render_destroy(priv->render);
+
 		FTK_ZFREE(priv, sizeof(PrivInfo));
 	}
 
@@ -133,10 +151,12 @@ void ftk_list_set_visible_nr(FtkWidget* thiz, int nr)
 static Ret ftk_list_init(FtkWidget* thiz, FtkListModel* model, FtkListRender* render)
 {
 	DECL_PRIV0(thiz, priv);
-	return_val_if_fail(priv != NULL && render != NULL && model != NULL, RET_FAIL);
+	return_val_if_fail(thiz != NULL && priv != NULL && render != NULL && model != NULL, RET_FAIL);
 	
     priv->model = model;
     priv->render = render;
+    priv->visible_start = 0;
+    priv->current = 0;
 
 	ftk_list_render_init(render, model, thiz);
 
@@ -151,7 +171,7 @@ FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int heigh
 	thiz->priv_subclass[0] = (PrivInfo*)FTK_ZALLOC(sizeof(PrivInfo));
 	if(thiz->priv_subclass[0] != NULL)
 	{
-		DECL_PRIV0(thiz, priv);
+		/* DECL_PRIV0(thiz, priv); */
 		thiz->on_event = ftk_list_on_event;
 		thiz->on_paint = ftk_list_on_paint;
 		thiz->destroy  = ftk_list_destroy;
