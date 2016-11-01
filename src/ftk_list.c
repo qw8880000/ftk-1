@@ -43,6 +43,8 @@
 #include "ftk_globals.h"
 #include "ftk_window.h"
 #include "ftk_list.h"
+#include "ftk_list_model.h"
+#include "ftk_list_render.h"
 
 typedef struct _ListPrivInfo
 {
@@ -55,14 +57,10 @@ typedef struct _ListPrivInfo
 	/* int top_margin; */
 	/* int botton_margin; */
 	/* int scrolled_by_me; */
-	/* FtkListModel*  model; */
-	/* FtkListRender* render; */
+    FtkListModel*  model;
+    FtkListRender* render;
 	/* FtkWidget* vscroll_bar; */
 	
-    /* FtkBitmap* bg_normal; */
-    /* FtkBitmap* bg_focus; */
-    /* FtkBitmap* bg_active; */
-
 	void* listener_ctx;
 	FtkListener listener;
 }PrivInfo;
@@ -115,8 +113,7 @@ static void ftk_list_destroy(FtkWidget* thiz)
 	{
 		DECL_PRIV0(thiz, priv);
 
-		/* ftk_list_render_destroy(priv->render); */
-		/* ftk_list_model_unref(priv->model); */
+        ftk_list_model_unref(priv->model);
 		FTK_ZFREE(priv, sizeof(PrivInfo));
 	}
 
@@ -128,6 +125,22 @@ void ftk_list_set_visible_nr(FtkWidget* thiz, int nr)
     DECL_PRIV0(thiz, priv);
 
     priv->visible_nr = nr;
+}
+
+#include "ftk_list_model_ranks.h"
+#include "ftk_list_render_ranks.h"
+
+static Ret ftk_list_init(FtkWidget* thiz, FtkListModel* model, FtkListRender* render)
+{
+	DECL_PRIV0(thiz, priv);
+	return_val_if_fail(priv != NULL && render != NULL && model != NULL, RET_FAIL);
+	
+    priv->model = model;
+    priv->render = render;
+
+	ftk_list_render_init(render, model, thiz);
+
+	return RET_OK;
 }
 
 FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int height)
@@ -144,7 +157,9 @@ FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int heigh
 		thiz->destroy  = ftk_list_destroy;
 
 		ftk_widget_init(thiz, FTK_LIST, 0, x, y, width, height, FTK_ATTR_INSENSITIVE|FTK_ATTR_BG_FOUR_CORNER);
-		ftk_widget_append_child(parent, thiz);
+        ftk_widget_append_child(parent, thiz);
+
+        ftk_list_init(thiz, ftk_list_model_ranks_create(), ftk_list_render_ranks_create());
 	}
 	else
 	{
@@ -153,4 +168,5 @@ FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int heigh
 
 	return thiz;
 }
+
 
