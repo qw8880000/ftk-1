@@ -92,8 +92,10 @@ static void ftk_list_item_destroy(FtkWidget* thiz)
 
 static Ret ftk_list_item_on_paint(FtkWidget* thiz)
 {
-	FTK_BEGIN_PAINT(x, y, width, height, canvas);
-	FTK_END_PAINT();
+	/* FTK_BEGIN_PAINT(x, y, width, height, canvas); */
+	/* FTK_END_PAINT(); */
+
+    return RET_OK;
 }
 
 FtkWidget* ftk_list_item_create(FtkWidget* parent, int x, int y, int width, int height)

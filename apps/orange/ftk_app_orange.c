@@ -15,6 +15,8 @@ static FtkWidget* ftk_orange_create_window(void)
 
 	FtkWidget* win = ftk_orange_xul_load("xul/main.xul");
 
+    ftk_widget_show_all(win, 1);
+
     return win;
 }
 

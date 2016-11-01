@@ -40,6 +40,12 @@ static const char* orange_translate_path(const char* path, char out_path[FTK_MAX
 	return out_path;
 }
 
+static FtkBitmap* orange_load_image(void* ctx, const char* filename)
+{
+    ftk_logw("--> filename %s\n", filename);
+    return ftk_theme_load_image(ftk_default_theme(), filename);
+}
+
 FtkWidget* ftk_orange_xul_load(const char* filename)
 {
 	FtkXulCallbacks callbacks = {0};
@@ -47,7 +53,7 @@ FtkWidget* ftk_orange_xul_load(const char* filename)
 	
 	callbacks.ctx = NULL;
 	callbacks.translate_text = orange_translate_text;
-	callbacks.load_image = (FtkXulLoadImage)ftk_icon_cache_load;
+	callbacks.load_image = (FtkXulLoadImage)orange_load_image;
 
 	orange_translate_path(filename, path);
 

@@ -105,8 +105,9 @@ static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
 
 static Ret ftk_list_on_paint(FtkWidget* thiz)
 {
-	FTK_BEGIN_PAINT(x, y, width, height, canvas);
-	FTK_END_PAINT();
+	/* FTK_BEGIN_PAINT(x, y, width, height, canvas); */
+	/* FTK_END_PAINT(); */
+    return RET_OK;
 }
 
 static void ftk_list_destroy(FtkWidget* thiz)
