@@ -1,32 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window value="orange" x="0" y="0" w="$ww" h="$wh" attr="$FTK_ATTR_IGNORE_CLOSE" bg[normal]="ffffffff" visible="1">
 
-    <list value="list" x="0" y="20" w="$ww" h="200" bg[normal]="ffff0000" visible="1" >
+    <list value="list" x="0" y="20" w="$ww-10" h="300" 
+        x_attr="X_CENTER_IN_PARENT"
+        bg[normal]="ffff0000" visible="1" bg_image[disable]="list_view_bg.png">
 
-        <list_item visible="1" w="$pw-20" h="50" 
+        <list_item visible="1" y="5" w="$pw-10" h="50" 
             x_attr="X_CENTER_IN_PARENT"
-            y_attr="Y_FLOAT_TOP" 
             bg_image[normal]="list_selector_background_normal.png"
             bg_image[active]="list_selector_background_pressed.png"
             bg_image[focused]="list_selector_background_focus.png"
             bg[normal]="ff00ff00">
 
-            <image visible="1" w="30" h="30"
+            <image visible="1" w="32" h="32"
+                x_attr="X_LEFT_IN_PARENT"
+                y_attr="Y_CENTER_IN_PARENT"
+                value="mime_audio.png"/>
+
+            <label visible="1" w="$pw-32-38" h="22"
                 x_attr="X_FLOAT_LEFT"
                 y_attr="Y_CENTER_IN_PARENT"
-                value="list_selector_background_focus.png"/>
-            <image visible="1" w="30" h="30"
-                x_attr="X_FLOAT_LEFT"
+                value="1234567890adfjasdlfasdlfj"
+                />
+            <button visible="1" w="38" h="48"
+                x_attr="X_RIGHT_IN_PARENT"
                 y_attr="Y_CENTER_IN_PARENT"
-                value="list_selector_background_focus.png"/>
-            <image visible="1" w="30" h="30"
-                x_attr="X_FLOAT_LEFT"
-                y_attr="Y_CENTER_IN_PARENT"
-                value="list_selector_background_focus.png"/>
+                bg_image[normal]="btn_radio_off.png"
+                bg_image[active]="btn_radio_on_pressed.png"
+                bg_image[focused]="btn_radio_on.png"
+                value=""/>
 
         </list_item>
 
-        <list_item visible="1" w="$pw-20" h="50" 
+        <list_item visible="1" w="$pw-10" h="50" 
             x_attr="X_CENTER_IN_PARENT"
             y_attr="Y_FLOAT_TOP" 
             bg_image[normal]="list_selector_background_normal.png"
@@ -34,22 +40,26 @@
             bg_image[focused]="list_selector_background_focus.png"
             bg[normal]="ff0ffff0">
 
-            <image visible="1" w="30" h="30"
+            <image visible="1" w="32" h="32"
+                x_attr="X_LEFT_IN_PARENT"
+                y_attr="Y_CENTER_IN_PARENT"
+                value="mime_audio.png"/>
+            <label visible="1" w="$pw-32-38" h="22"
                 x_attr="X_FLOAT_LEFT"
                 y_attr="Y_CENTER_IN_PARENT"
-                value="list_selector_background_focus.png"/>
-            <image visible="1" w="30" h="30"
-                x_attr="X_FLOAT_LEFT"
+                value="1234567890adfjasdlfasdlfj"
+                />
+            <button visible="1" w="38" h="48"
+                x_attr="X_RIGHT_IN_PARENT"
                 y_attr="Y_CENTER_IN_PARENT"
-                value="list_selector_background_focus.png"/>
-            <image visible="1" w="30" h="30"
-                x_attr="X_FLOAT_LEFT"
-                y_attr="Y_CENTER_IN_PARENT"
-                value="list_selector_background_focus.png"/>
+                bg_image[normal]="btn_radio_off.png"
+                bg_image[active]="btn_radio_on_pressed.png"
+                bg_image[focused]="btn_radio_on.png"
+                value=""/>
 
         </list_item>
 
-        <list_item visible="1" w="$pw-20" h="50" 
+        <list_item visible="1" w="$pw-10" h="50" 
             x_attr="X_CENTER_IN_PARENT"
             y_attr="Y_FLOAT_TOP" 
             bg_image[normal]="list_selector_background_normal.png"
@@ -57,22 +67,26 @@
             bg_image[focused]="list_selector_background_focus.png"
             bg[normal]="ff0ffff0">
 
-            <image visible="1" w="30" h="30"
+            <image visible="1" w="32" h="32"
+                x_attr="X_LEFT_IN_PARENT"
+                y_attr="Y_CENTER_IN_PARENT"
+                value="mime_audio.png"/>
+            <label visible="1" w="$pw-32-38" h="22"
                 x_attr="X_FLOAT_LEFT"
                 y_attr="Y_CENTER_IN_PARENT"
-                value="list_selector_background_focus.png"/>
-            <image visible="1" w="30" h="30"
-                x_attr="X_FLOAT_LEFT"
+                value="1234567890adfjasdlfasdlfj"
+                />
+            <button visible="1" w="38" h="48"
+                x_attr="X_RIGHT_IN_PARENT"
                 y_attr="Y_CENTER_IN_PARENT"
-                value="list_selector_background_focus.png"/>
-            <image visible="1" w="30" h="30"
-                x_attr="X_FLOAT_LEFT"
-                y_attr="Y_CENTER_IN_PARENT"
-                value="list_selector_background_focus.png"/>
+                bg_image[normal]="btn_radio_off.png"
+                bg_image[active]="btn_radio_on_pressed.png"
+                bg_image[focused]="btn_radio_on.png"
+                value=""/>
 
         </list_item>
 
-        <list_item visible="1" w="$pw-20" h="50" 
+        <list_item visible="1" w="$pw-10" h="50" 
             x_attr="X_CENTER_IN_PARENT"
             y_attr="Y_FLOAT_TOP" 
             bg_image[normal]="list_selector_background_normal.png"
@@ -80,18 +94,49 @@
             bg_image[focused]="list_selector_background_focus.png"
             bg[normal]="ff0ffff0">
 
-            <image visible="1" w="30" h="30"
+            <image visible="1" w="32" h="32"
+                x_attr="X_LEFT_IN_PARENT"
+                y_attr="Y_CENTER_IN_PARENT"
+                value="mime_audio.png"/>
+            <label visible="1" w="$pw-32-38" h="22"
                 x_attr="X_FLOAT_LEFT"
                 y_attr="Y_CENTER_IN_PARENT"
-                value="list_selector_background_focus.png"/>
-            <image visible="1" w="30" h="30"
+                value="1234567890adfjasdlfasdlfj"
+                />
+            <button visible="1" w="38" h="48"
+                x_attr="X_RIGHT_IN_PARENT"
+                y_attr="Y_CENTER_IN_PARENT"
+                bg_image[normal]="btn_radio_off.png"
+                bg_image[active]="btn_radio_on_pressed.png"
+                bg_image[focused]="btn_radio_on.png"
+                value=""/>
+
+        </list_item>
+
+        <list_item visible="1" w="$pw-10" h="50" 
+            x_attr="X_CENTER_IN_PARENT"
+            y_attr="Y_FLOAT_TOP" 
+            bg_image[normal]="list_selector_background_normal.png"
+            bg_image[active]="list_selector_background_pressed.png"
+            bg_image[focused]="list_selector_background_focus.png"
+            bg[normal]="ff0ffff0">
+
+            <image visible="1" w="32" h="32"
+                x_attr="X_LEFT_IN_PARENT"
+                y_attr="Y_CENTER_IN_PARENT"
+                value="mime_audio.png"/>
+            <label visible="1" w="$pw-32-38" h="22"
                 x_attr="X_FLOAT_LEFT"
                 y_attr="Y_CENTER_IN_PARENT"
-                value="list_selector_background_focus.png"/>
-            <image visible="1" w="30" h="30"
-                x_attr="X_FLOAT_LEFT"
+                value="1234567890adfjasdlfasdlfj"
+                />
+            <button visible="1" w="38" h="48"
+                x_attr="X_RIGHT_IN_PARENT"
                 y_attr="Y_CENTER_IN_PARENT"
-                value="list_selector_background_focus.png"/>
+                bg_image[normal]="btn_radio_off.png"
+                bg_image[active]="btn_radio_on_pressed.png"
+                bg_image[focused]="btn_radio_on.png"
+                value=""/>
 
         </list_item>
 
