@@ -1,6 +1,9 @@
 *Makefile
 *.o
 *.lo
+*.la
+.deps/
+.libs/
 src/.deps/
 apps/calculator/.deps/
 apps/desktop/.deps/
@@ -13,7 +16,6 @@ config.log
 config.status
 config_ftk.h
 config_ftk.h.in~
-fbus/.deps/
 fbus/demo/.deps/
 fbus/demo/echo.service
 fix.patch
@@ -209,4 +211,7 @@ src/test/primary_source_test
 src/test/widget_test
 tools/imconvert/fitx_convert
 tools/imconvert/shrink
+aclocal.m4
+configure
+apps/orange/orange
 
