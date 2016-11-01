@@ -47,8 +47,8 @@
 typedef struct _ListPrivInfo
 {
 	/* int current; */
-	/* int visible_nr; */
-	/* int visible_start; */
+    int visible_nr;
+    int visible_start;
 	/* int item_height; */
 
 	/* int is_active; */
@@ -62,8 +62,6 @@ typedef struct _ListPrivInfo
     /* FtkBitmap* bg_normal; */
     /* FtkBitmap* bg_focus; */
     /* FtkBitmap* bg_active; */
-    int item_nr;
-
 
 	void* listener_ctx;
 	FtkListener listener;
@@ -105,6 +103,7 @@ static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
 
 static Ret ftk_list_on_paint(FtkWidget* thiz)
 {
+	DECL_PRIV0(thiz, priv);
 	/* FTK_BEGIN_PAINT(x, y, width, height, canvas); */
 	/* FTK_END_PAINT(); */
     return RET_OK;
@@ -124,6 +123,12 @@ static void ftk_list_destroy(FtkWidget* thiz)
 	return;
 }
 
+void ftk_list_set_visible_nr(FtkWidget* thiz, int nr)
+{
+    DECL_PRIV0(thiz, priv);
+
+    priv->visible_nr = nr;
+}
 
 FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int height)
 {
