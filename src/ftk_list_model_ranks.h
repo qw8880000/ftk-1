@@ -12,7 +12,7 @@ typedef struct _FtkListModelRanksInfo
     char* text;
 }FtkListModelRanksInfo;
 
-FtkListModel* ftk_list_model_ranks_create(size_t init_nr);
+FtkListModel* ftk_list_model_ranks_create(void);
 
 FTK_END_DECLS
 

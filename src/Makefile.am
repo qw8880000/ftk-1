@@ -74,7 +74,7 @@ libftk_la_SOURCES=\
 	ftk_interpolator_acc_decelerate.c  ftk_interpolator_bounce.c   \
 	ftk_interpolator_accelerate.c      ftk_interpolator_decelerate.c \
 	ftk_input_pattern.c ftk_key_board.c \
-	ftk_list.c ftk_list_item.c \
+	ftk_list.c ftk_list_item.c ftk_list_model_ranks.c \
 	$(OPTIONAL_FUNCS)
 
 if ENABLE_LINEBREAK
@@ -258,6 +258,7 @@ ftk_HEADERS=\
 	ftk_key.h \
 	ftk_input_pattern.h \
 	ftk_label.h \
+	ftk_list_model_ranks.h \
 	ftk_list_model_default.h \
 	ftk_list_model.h \
 	ftk_list_render_default.h \

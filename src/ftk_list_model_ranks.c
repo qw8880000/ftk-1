@@ -41,6 +41,9 @@
 #include "ftk.h"
 #include "ftk_list_model_ranks.h"
 
+#define CELL_ADD_STEP    6
+#define ROW_ADD_STEP    10
+
 typedef struct _FtkListModelCell
 {
     char* text;
@@ -50,14 +53,16 @@ typedef struct _FtkListModelRow
 {
     int cell_nr;
     int cell_alloc_nr;
-    int current_cell;
+    int cell_current;
     FtkListModelCell* cells;
 }FtkListModelRow;
 
 typedef struct _ListModelRanksPrivInfo
-{
+{   
+    /* row */
 	int row_nr;
 	int row_alloc_nr;
+    int row_current;
 	FtkListModelRow* rows;
 }PrivInfo;
 
@@ -79,40 +84,7 @@ static Ret ftk_list_model_ranks_destroy_row(FtkListModelRow* row)
 	return RET_OK;
 }
 
-static int  ftk_list_model_ranks_get_total(FtkListModel* thiz)
-{
-	DECL_PRIV(thiz, priv);
-	return_val_if_fail(priv != NULL, 0);
 
-	return priv->row_nr;
-}
-
-static Ret  ftk_list_model_ranks_get_data(FtkListModel* thiz, size_t index, void** ret)
-{
-	DECL_PRIV(thiz, priv);
-	return_val_if_fail(priv != NULL && index < priv->row_nr && ret != NULL, RET_FAIL);
-	
-	*ret = priv->rows + index;
-	
-	return RET_OK;
-}
-
-static void ftk_list_model_ranks_destroy(FtkListModel* thiz)
-{
-	int r = 0;
-	DECL_PRIV(thiz, priv);
-    return_if_fail(priv != NULL);
-	
-    for(r = 0; r < priv->row_nr; r++)
-    {
-        FtkListModelRow* row = priv->rows+r;
-        ftk_list_model_ranks_destroy_row(row);
-    }
-    FTK_FREE(priv->rows);
-    FTK_ZFREE(thiz, sizeof(FtkListModel) + sizeof(PrivInfo));
-
-	return;
-}
 
 static Ret ftk_list_model_ranks_extend_row(FtkListModel* thiz, size_t delta)
 {
@@ -126,7 +98,7 @@ static Ret ftk_list_model_ranks_extend_row(FtkListModel* thiz, size_t delta)
 		return RET_OK;
 	}
 
-	row_alloc_nr = (priv->row_alloc_nr + delta) + FTK_HALF(priv->row_alloc_nr + delta) + 2; 
+	row_alloc_nr = (priv->row_alloc_nr + delta) + ROW_ADD_STEP;
 	rows = (FtkListModelRow*)FTK_REALLOC(priv->rows, sizeof(FtkListModelRow) * row_alloc_nr);
 	if(rows != NULL)
 	{
@@ -143,14 +115,14 @@ static Ret ftk_list_model_ranks_extend_cell(FtkListModel* thiz, int row_index, s
 	DECL_PRIV(thiz, priv);
 	FtkListModelRow* row = priv->rows + row_index;
     FtkListModelCell* cells = NULL;
-	return_val_if_fail(thiz != NULL && priv->rows != NULL && row != NULL, RET_FAIL);
+	return_val_if_fail(thiz != NULL && priv->rows != NULL, RET_FAIL);
 
 	if((row->cell_nr + delta) < row->cell_alloc_nr)
 	{
 		return RET_OK;
 	}
 
-	cell_alloc_nr = (row->cell_alloc_nr + delta) + 2;
+	cell_alloc_nr = (row->cell_alloc_nr + delta) + CELL_ADD_STEP;
 	cells = (FtkListModelCell*)FTK_REALLOC(row->cells, sizeof(FtkListModelCell) * cell_alloc_nr);
 	if(cells != NULL)
 	{
@@ -161,50 +133,61 @@ static Ret ftk_list_model_ranks_extend_cell(FtkListModel* thiz, int row_index, s
 	return (row->cell_nr + delta) < row->cell_alloc_nr ? RET_OK : RET_FAIL;
 }
 
-static Ret ftk_list_item_copy(FtkListModel* thiz, FtkListModelRow* dst, FtkListModelRow* src)
+static Ret ftk_list_model_ranks_add_cell(FtkListModel* thiz, FtkListModelRanksInfo* info)
 {
-	return_val_if_fail(dst != NULL && src != NULL && thiz != NULL, RET_FAIL);
-	
-	memcpy(dst, src, sizeof(FtkListItemInfo));
+	DECL_PRIV(thiz, priv);
+    FtkListModelRow* row = NULL;
+    FtkListModelCell* cell = NULL;
 
-	/* if(src->text != NULL) */
-	/* { */
-		/* dst->text = ftk_strdup(src->text); */
-	/* } */
+	return_val_if_fail(thiz != NULL && info != NULL, RET_FAIL);
+    return_val_if_fail(info->cell_index >= 0, RET_FAIL);
+    return_val_if_fail(ftk_list_model_ranks_extend_cell(thiz, info->row_index, 1) == RET_OK, RET_FAIL);
+
+    row = priv->rows + info->row_index;
+    cell = row->cells + row->cell_nr;
+
+    cell->text = ftk_strdup(info->text);
+    row->cell_nr++;
 
 	return RET_OK;
 }
+
 
 static Ret ftk_list_model_ranks_add(FtkListModel* thiz, void* data)
 {
 	DECL_PRIV(thiz, priv);
 	FtkListModelRanksInfo* info = (FtkListModelRanksInfo*)data;
-	return_val_if_fail(thiz != NULL && info != NULL, RET_FAIL);
-	return_val_if_fail(ftk_list_model_ranks_extend(thiz, 1) == RET_OK, RET_FAIL);
 
-    if(info->row_index == priv->row_nr-1)
+	return_val_if_fail(thiz != NULL && info != NULL, RET_FAIL);
+    return_val_if_fail(info->row_index >= 0 && info->row_index <= priv->row_nr, RET_FAIL);
+    return_val_if_fail(ftk_list_model_ranks_extend_row(thiz, 1) == RET_OK, RET_FAIL);
+
+    if(ftk_list_model_ranks_add_cell(thiz, info) != RET_OK)
     {
+        return RET_FAIL;
     }
-    else if(info->row_index >= priv->row_nr)
+
+    if(info->row_index >= priv->row_nr)
     {
-        /* dst->text = ftk_strdup(src->text); */
 		priv->row_nr++;
     }
 
-	return RET_OK;
+    return RET_OK;
 }
 
 static Ret ftk_list_model_ranks_reset(FtkListModel* thiz)
 {
-	size_t i = 0;
+    int r = 0;
 	DECL_PRIV(thiz, priv);
-	return_val_if_fail(thiz != NULL, RET_FAIL);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+	
+    for(r = 0; r < priv->row_nr; r++)
+    {
+        FtkListModelRow* row = priv->rows+r;
+        ftk_list_model_ranks_destroy_row(row);
+    }
 
-	/* for(i = 0; i < priv->row_nr; i++) */
-	/* { */
-		/* ftk_list_item_reset(priv->items+i); */
-	/* } */
-	/* priv->row_nr = 0; */
+    priv->row_nr = 0;
 
 	return RET_OK;
 }
@@ -232,7 +215,50 @@ static Ret ftk_list_model_ranks_remove(FtkListModel* thiz, size_t index)
 	return RET_OK;
 }
 
-FtkListModel* ftk_list_model_ranks_create(size_t init_nr)
+static void ftk_list_model_ranks_destroy(FtkListModel* thiz)
+{
+	int r = 0;
+	DECL_PRIV(thiz, priv);
+    return_if_fail(priv != NULL);
+	
+    for(r = 0; r < priv->row_nr; r++)
+    {
+        FtkListModelRow* row = priv->rows+r;
+        ftk_list_model_ranks_destroy_row(row);
+    }
+    FTK_FREE(priv->rows);
+    FTK_ZFREE(thiz, sizeof(FtkListModel) + sizeof(PrivInfo));
+
+    ftk_logd("%s\n", __func__);
+
+	return;
+}
+
+static int ftk_list_model_ranks_get_total(FtkListModel* thiz)
+{
+	DECL_PRIV(thiz, priv);
+	return_val_if_fail(priv != NULL, 0);
+
+	return priv->row_nr;
+}
+
+static Ret  ftk_list_model_ranks_get_data(FtkListModel* thiz, size_t index, void** ret)
+{
+    DECL_PRIV(thiz, priv);
+    FtkListModelRanksInfo* info = (FtkListModelRanksInfo*)*ret;
+    FtkListModelRow* row = priv->rows + info->row_index;
+    FtkListModelCell* cell = NULL;
+	return_val_if_fail(priv != NULL && ret != NULL, RET_FAIL);
+    return_val_if_fail(info->row_index >=0 && info->row_index < priv->row_nr, RET_FAIL);
+    return_val_if_fail(info->cell_index >=0 && info->cell_index < row->cell_nr, RET_FAIL);
+    
+    cell = row->cells + info->cell_index;
+    info->text = cell->text;
+
+	return RET_OK;
+}
+
+FtkListModel* ftk_list_model_ranks_create(void)
 {
 	FtkListModel* thiz = FTK_NEW_PRIV(FtkListModel);
 	if(thiz != NULL)
@@ -246,7 +272,7 @@ FtkListModel* ftk_list_model_ranks_create(size_t init_nr)
 		thiz->destroy   = ftk_list_model_ranks_destroy;
 
 		thiz->ref = 1;
-		priv->row_alloc_nr = init_nr;
+        ftk_logd("%s\n", __func__);
 	}
 
 	return thiz;
