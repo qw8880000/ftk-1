@@ -121,6 +121,9 @@ typedef struct _FtkWidgetCreateInfo
 	/*text_view*/
 	int readonly;
 
+    /* list */
+    int visible_nr;
+
     int type;
     FtkBitmap* icon;
     const char *font;
@@ -531,13 +534,16 @@ static FtkWidget* ftk_xul_list_create(FtkWidgetCreateInfo* info)
 {
     FtkWidget* widget = NULL;
 
-    ftk_logw("x=%d,y=%d,w=%d,h=%d\n", info->x, info->y, info->w, info->h);
-
     widget = ftk_list_create(info->parent, info->x, info->y, info->w, info->h);
 	if(info->value != NULL)
 	{
 		ftk_widget_set_text(widget, ftk_xul_translate_text(info->priv->callbacks, info->value));
 	}
+
+    if(info->visible_nr > 0)
+    {
+        ftk_list_set_visible_nr(widget, info->visible_nr);
+    }
 
     return widget;
 }
@@ -545,8 +551,6 @@ static FtkWidget* ftk_xul_list_create(FtkWidgetCreateInfo* info)
 static FtkWidget* ftk_xul_list_item_create(FtkWidgetCreateInfo* info)
 {
     FtkWidget* widget = NULL;
-
-    ftk_logw("list_item parent = %s\n", ftk_widget_get_text(info->parent));
 
     widget = ftk_list_item_create(info->parent, info->x, info->y, info->w, info->h);
 
@@ -953,16 +957,18 @@ static void ftk_xul_builder_init_widget_info(FtkXmlBuilder* thiz, const char** a
 			}
 			case 'v':
 			{
-				if(name[1] == 'a')
+				if(name[1] == 'a')/*value*/
 				{
-					/*value*/
 					info->value = value;
 				}
-				else if(name[1] == 'i')
+				else if(strcmp(name, "visible") == 0)/*visiable*/
 				{
-					/*visiable*/
 					info->visible = atoi(value);
 				}
+                else if(strcmp(name, "visible_nr") == 0) /* visible_nr */
+                {
+                    info->visible_nr = atoi(value);
+                }
 				break;
 			}
 			case 'm':

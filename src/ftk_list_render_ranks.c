@@ -72,9 +72,13 @@ static Ret ftk_list_render_ranks_paint(FtkListRender* thiz, FtkCanvas* canvas, i
     int r = 0;
     int c = 0;
     int total = ftk_list_model_get_total(model);
+    FtkListModelRanksInfo info = {0};
+    FtkListModelRanksInfo* p_info = &info;
 
 	return_val_if_fail(priv != NULL && model != NULL && list != NULL, RET_FAIL);
     return_val_if_fail(visible_start >= total, RET_FAIL);
+
+    ftk_logi("%s-> visible_start=%d, visible_nr=%d\n", __func__, visible_start, visible_nr);
 
     r = 0;
     for(row = ftk_widget_child(list); row != NULL; row = ftk_widget_next(row))
@@ -86,22 +90,33 @@ static Ret ftk_list_render_ranks_paint(FtkListRender* thiz, FtkCanvas* canvas, i
 
         if(visible_start + r >= total)
         {
-            ftk_widget_set_visible(row, 0);
+            c = 0;
+            for(cell = ftk_widget_child(row); cell != NULL; cell = ftk_widget_next(cell))
+            {
+                ftk_widget_set_visible(cell, 0);
+                c++;
+            }
+
+            ftk_widget_set_insensitive(row, 1);
         }
         else
         {
             c = 0;
             for(cell = ftk_widget_child(row); cell != NULL; cell = ftk_widget_next(cell))
             {
-                const char* text = ftk_list_model_ranks_get_text(model, r, c);
+                info.row_index = r;
+                info.cell_index = c;
+                ftk_list_model_get_data(model, 0, (void**)&p_info);
 
-                if(text != NULL)
+                if(info.text != NULL)
                 {
-                    ftk_widget_set_text(cell, text);
+                    ftk_widget_set_text(cell, info.text);
                 }
 
                 c++;
             }
+
+            ftk_widget_set_insensitive(row, 0);
         }
 
         r++;

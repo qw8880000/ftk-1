@@ -242,7 +242,6 @@ static int ftk_list_model_ranks_get_total(FtkListModel* thiz)
 	return priv->row_nr;
 }
 
-#if 0
 static Ret  ftk_list_model_ranks_get_data(FtkListModel* thiz, size_t index, void** ret)
 {
     DECL_PRIV(thiz, priv);
@@ -258,21 +257,6 @@ static Ret  ftk_list_model_ranks_get_data(FtkListModel* thiz, size_t index, void
 
 	return RET_OK;
 }
-#endif
-
-const char* ftk_list_model_ranks_get_text(FtkListModel* thiz, int row_index, int cell_index)
-{
-    DECL_PRIV(thiz, priv);
-    FtkListModelRow* row = priv->rows + row_index;
-    FtkListModelCell* cell = NULL;
-	return_val_if_fail(priv != NULL && thiz != NULL, NULL);
-    return_val_if_fail(row_index >=0 && row_index < priv->row_nr, NULL);
-    return_val_if_fail(cell_index >=0 && cell_index < row->cell_nr, NULL);
-    
-    cell = row->cells + cell_index;
-
-    return (const char*)(cell->text);
-}
 
 FtkListModel* ftk_list_model_ranks_create(void)
 {
@@ -281,7 +265,7 @@ FtkListModel* ftk_list_model_ranks_create(void)
 	{
 		DECL_PRIV(thiz, priv);
 		thiz->get_total = ftk_list_model_ranks_get_total;
-		thiz->get_data  = NULL;
+		thiz->get_data  = ftk_list_model_ranks_get_data;
 		thiz->add       = ftk_list_model_ranks_add;
 		thiz->reset     = ftk_list_model_ranks_reset;
 		thiz->remove    = ftk_list_model_ranks_remove;

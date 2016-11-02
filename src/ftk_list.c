@@ -105,8 +105,6 @@ static Ret ftk_list_on_paint(FtkWidget* thiz)
 	int total = ftk_list_model_get_total(priv->model);
     int i = 0;
 
-    FTK_BEGIN_PAINT(x, y, width, height, canvas);
-
     if((priv->visible_start + priv->visible_nr) >= total)
     {
         int visible_start = total - priv->visible_nr;
@@ -118,9 +116,9 @@ static Ret ftk_list_on_paint(FtkWidget* thiz)
 		priv->current = total - 1;
 	}
 
-    ftk_list_render_paint(priv->render, canvas, priv->visible_start, priv->visible_nr, 0, 0, 0);
+    ftk_list_render_paint(priv->render, NULL, priv->visible_start, priv->visible_nr, 0, 0, 0);
 
-    FTK_END_PAINT();
+    return RET_OK;
 }
 
 static void ftk_list_destroy(FtkWidget* thiz)
@@ -141,9 +139,59 @@ static void ftk_list_destroy(FtkWidget* thiz)
 void ftk_list_set_visible_nr(FtkWidget* thiz, int nr)
 {
     DECL_PRIV0(thiz, priv);
+	return_if_fail(thiz != NULL && priv != NULL);
 
     priv->visible_nr = nr;
 }
+
+void ftk_list_page_prev(FtkWidget* thiz)
+{
+    DECL_PRIV0(thiz, priv);
+	return_if_fail(thiz != NULL && priv != NULL);
+
+    priv->visible_start = (priv->visible_start - priv->visible_nr) > 0 ? (priv->visible_start - priv->visible_nr) : 0;
+
+    ftk_widget_invalidate(thiz);
+}
+
+void ftk_list_page_next(FtkWidget* thiz)
+{
+    DECL_PRIV0(thiz, priv);
+    int total = ftk_list_model_get_total(priv->model);
+	return_if_fail(thiz != NULL && priv != NULL);
+    
+    priv->visible_start = (priv->visible_start + priv->visible_nr) < total ? (priv->visible_start + priv->visible_nr) : priv->visible_start;
+
+    ftk_widget_invalidate(thiz);
+}
+
+int ftk_list_get_total_page_num(FtkWidget* thiz)
+{
+    DECL_PRIV0(thiz, priv);
+    int total = ftk_list_model_get_total(priv->model);
+	return_val_if_fail(thiz != NULL && priv != NULL, 0);
+
+    if(priv->visible_nr == 0)
+    {
+        return 0;
+    }
+
+    return (total % priv->visible_nr == 0) ? (total / priv->visible_nr) : (total / priv->visible_nr + 1);
+}
+
+int ftk_list_get_cur_page_num(FtkWidget* thiz)
+{
+    DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL && priv != NULL, 0);
+
+    if(priv->visible_nr == 0)
+    {
+        return 0;
+    }
+
+    return priv->visible_start / priv->visible_nr;
+}
+
 
 #include "ftk_list_model_ranks.h"
 #include "ftk_list_render_ranks.h"

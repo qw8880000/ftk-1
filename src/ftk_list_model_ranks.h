@@ -13,7 +13,6 @@ typedef struct _FtkListModelRanksInfo
 }FtkListModelRanksInfo;
 
 FtkListModel* ftk_list_model_ranks_create(void);
-const char* ftk_list_model_ranks_get_text(FtkListModel* thiz, int row_index, int cell_index);
 
 FTK_END_DECLS
 
