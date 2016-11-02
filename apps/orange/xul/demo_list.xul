@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <window value="orange" x="0" y="0" w="$ww" h="$wh" attr="$FTK_ATTR_IGNORE_CLOSE" bg[normal]="ffffffff" visible="1">
 
-    <list value="list" x="0" y="20" w="$ww-10" h="300" 
+    <list id="2" value="list" x="0" y="20" w="$ww-10" h="300" 
         x_attr="X_CENTER_IN_PARENT"
         bg[normal]="ffff0000" visible="1" 
         bg_image[disable]="list_view_bg.png"
@@ -144,5 +144,10 @@
 
 
     </list>
+
+    <button id="100" value="prev" x="0" y="320" w="60" h="40" visible="1"/>
+    <button id="101" value="next" x="60" y="320" w="60" h="40" visible="1"/>
+    <button id="102" value="remove" x="120" y="320" w="60" h="40" visible="1"/>
+    <button id="103" value="clear" x="180" y="320" w="60" h="40" visible="1"/>
 
 </window>

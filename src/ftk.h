@@ -79,6 +79,8 @@ extern "C" {
 #include "ftk_tab.h"
 #include "ftk_list.h"
 #include "ftk_list_item.h"
+#include "ftk_list_model_ranks.h"
+#include "ftk_list_render_ranks.h"
 
 FTK_BEGIN_DECLS
 

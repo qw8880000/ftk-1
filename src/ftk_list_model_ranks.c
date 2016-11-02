@@ -81,6 +81,8 @@ static Ret ftk_list_model_ranks_destroy_row(FtkListModelRow* row)
     }
     FTK_FREE(row->cells);
 
+    memset(row, 0, sizeof(FtkListModelRow));
+
 	return RET_OK;
 }
 
@@ -93,7 +95,7 @@ static Ret ftk_list_model_ranks_extend_row(FtkListModel* thiz, size_t delta)
 	FtkListModelRow* rows = NULL;
 	return_val_if_fail(thiz != NULL, RET_FAIL);
 
-	if(priv->rows != NULL && (priv->row_nr + delta) < priv->row_alloc_nr)
+	if((priv->row_nr + delta) < priv->row_alloc_nr)
 	{
 		return RET_OK;
 	}
@@ -102,6 +104,9 @@ static Ret ftk_list_model_ranks_extend_row(FtkListModel* thiz, size_t delta)
 	rows = (FtkListModelRow*)FTK_REALLOC(priv->rows, sizeof(FtkListModelRow) * row_alloc_nr);
 	if(rows != NULL)
 	{
+        /* initial the new memory alloc */
+        memset(rows+priv->row_alloc_nr, 0, sizeof(FtkListModelRow) * (row_alloc_nr - priv->row_alloc_nr));
+
 		priv->rows = rows;
 		priv->row_alloc_nr = row_alloc_nr;
 	}
@@ -126,6 +131,9 @@ static Ret ftk_list_model_ranks_extend_cell(FtkListModel* thiz, int row_index, s
 	cells = (FtkListModelCell*)FTK_REALLOC(row->cells, sizeof(FtkListModelCell) * cell_alloc_nr);
 	if(cells != NULL)
 	{
+        /* initial the new memory alloc */
+        memset(cells+row->cell_alloc_nr, 0, sizeof(FtkListModelCell) * (cell_alloc_nr - row->cell_alloc_nr));
+
 		row->cells = cells;
 		row->cell_alloc_nr = cell_alloc_nr;
 	}
@@ -272,6 +280,12 @@ FtkListModel* ftk_list_model_ranks_create(void)
 		thiz->destroy   = ftk_list_model_ranks_destroy;
 
 		thiz->ref = 1;
+
+        priv->row_alloc_nr = 0;
+        priv->row_nr = 0;
+        priv->row_current = 0;
+        priv->rows = NULL;
+
         ftk_logd("%s\n", __func__);
 	}
 

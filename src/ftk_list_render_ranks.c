@@ -76,9 +76,9 @@ static Ret ftk_list_render_ranks_paint(FtkListRender* thiz, FtkCanvas* canvas, i
     FtkListModelRanksInfo* p_info = &info;
 
 	return_val_if_fail(priv != NULL && model != NULL && list != NULL, RET_FAIL);
-    return_val_if_fail(visible_start >= total, RET_FAIL);
+    return_val_if_fail(visible_start < total, RET_FAIL);
 
-    ftk_logi("%s-> visible_start=%d, visible_nr=%d\n", __func__, visible_start, visible_nr);
+    ftk_logi("%s-> visible_start=%d, visible_nr=%d, total=%d\n", __func__, visible_start, visible_nr, total);
 
     r = 0;
     for(row = ftk_widget_child(list); row != NULL; row = ftk_widget_next(row))
@@ -97,14 +97,14 @@ static Ret ftk_list_render_ranks_paint(FtkListRender* thiz, FtkCanvas* canvas, i
                 c++;
             }
 
-            ftk_widget_set_insensitive(row, 1);
+            /* ftk_widget_set_insensitive(row, 1); */
         }
         else
         {
             c = 0;
             for(cell = ftk_widget_child(row); cell != NULL; cell = ftk_widget_next(cell))
             {
-                info.row_index = r;
+                info.row_index = visible_start + r;
                 info.cell_index = c;
                 ftk_list_model_get_data(model, 0, (void**)&p_info);
 

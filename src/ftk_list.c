@@ -43,7 +43,6 @@
 #include "ftk_globals.h"
 #include "ftk_window.h"
 #include "ftk_list.h"
-#include "ftk_list_model.h"
 #include "ftk_list_render.h"
 
 typedef struct _ListPrivInfo
@@ -102,21 +101,6 @@ static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
 static Ret ftk_list_on_paint(FtkWidget* thiz)
 {
 	DECL_PRIV0(thiz, priv);
-	int total = ftk_list_model_get_total(priv->model);
-    int i = 0;
-
-    if((priv->visible_start + priv->visible_nr) >= total)
-    {
-        int visible_start = total - priv->visible_nr;
-        priv->visible_start = (visible_start >= 0) ? visible_start : 0;
-    }
-
-	if(priv->current >= total)
-	{
-		priv->current = total - 1;
-	}
-
-    ftk_list_render_paint(priv->render, NULL, priv->visible_start, priv->visible_nr, 0, 0, 0);
 
     return RET_OK;
 }
@@ -136,6 +120,27 @@ static void ftk_list_destroy(FtkWidget* thiz)
 	return;
 }
 
+int ftk_list_update(FtkWidget* thiz)
+{
+	DECL_PRIV0(thiz, priv);
+	int total = ftk_list_model_get_total(priv->model);
+
+    if((priv->visible_start + priv->visible_nr) >= total)
+    {
+        int visible_start = total - priv->visible_nr;
+        priv->visible_start = (visible_start >= 0) ? visible_start : 0;
+    }
+
+	if(priv->current >= total)
+	{
+		priv->current = total - 1;
+	}
+
+    ftk_list_render_paint(priv->render, NULL, priv->visible_start, priv->visible_nr, 0, 0, 0);
+
+    return RET_OK;
+}
+
 void ftk_list_set_visible_nr(FtkWidget* thiz, int nr)
 {
     DECL_PRIV0(thiz, priv);
@@ -151,7 +156,7 @@ void ftk_list_page_prev(FtkWidget* thiz)
 
     priv->visible_start = (priv->visible_start - priv->visible_nr) > 0 ? (priv->visible_start - priv->visible_nr) : 0;
 
-    ftk_widget_invalidate(thiz);
+    ftk_list_update(thiz);
 }
 
 void ftk_list_page_next(FtkWidget* thiz)
@@ -162,7 +167,8 @@ void ftk_list_page_next(FtkWidget* thiz)
     
     priv->visible_start = (priv->visible_start + priv->visible_nr) < total ? (priv->visible_start + priv->visible_nr) : priv->visible_start;
 
-    ftk_widget_invalidate(thiz);
+    /* ftk_widget_invalidate(thiz); */
+    ftk_list_update(thiz);
 }
 
 int ftk_list_get_total_page_num(FtkWidget* thiz)
@@ -190,6 +196,14 @@ int ftk_list_get_cur_page_num(FtkWidget* thiz)
     }
 
     return priv->visible_start / priv->visible_nr;
+}
+
+FtkListModel* ftk_list_get_model(FtkWidget* thiz)
+{
+	DECL_PRIV0(thiz, priv);
+	return_val_if_fail(priv != NULL, NULL);
+
+	return priv->model;
 }
 
 
