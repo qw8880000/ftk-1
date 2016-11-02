@@ -42,7 +42,7 @@ static const char* orange_translate_path(const char* path, char out_path[FTK_MAX
 
 static FtkBitmap* orange_load_image(void* ctx, const char* filename)
 {
-    ftk_logw("--> filename %s\n", filename);
+    ftk_logd("--> filename %s\n", filename);
     return ftk_theme_load_image(ftk_default_theme(), filename);
 }
 
