@@ -136,6 +136,15 @@ Ret ftk_list_update(FtkWidget* thiz)
 
 #endif
 
+    /* 最后一页，选中行要能需要调整 */
+    if(priv->visible_start + priv->rows_nr > total)
+    {
+        if(priv->selected_widget != NULL)
+        {
+            ftk_list_set_selected_item(thiz, ftk_list_get_item(thiz, total-priv->visible_start-1));
+        }
+    }
+
     ftk_list_render_paint(priv->render, NULL, priv->visible_start, priv->rows_nr, total, 0, 0);
 
     return RET_OK;
@@ -186,6 +195,11 @@ FtkWidget* ftk_list_get_item(FtkWidget* thiz, int row)
 
     for(; iter != NULL; iter = ftk_widget_next(iter))
     {
+        if(ftk_widget_type(iter) != FTK_LIST_ITEM) 
+        {
+            continue;
+        }
+
         if(r++ == row)
         {
             return iter;

@@ -111,21 +111,12 @@ static Ret ftk_list_render_ranks_init(FtkListRender* thiz, FtkListModel* model, 
 
 static Ret ftk_list_render_ranks_paint(FtkListRender* thiz, FtkCanvas* canvas, int visible_start, int rows_nr, int total, int w, int h)
 {
-	DECL_PRIV(thiz, priv);
-    FtkWidget* list = priv->list;
-    FtkListModel* model = priv->model;
-    FtkWidget* row = NULL;
-    FtkWidget* cell = NULL;
     int r = 0;
-    int c = 0;
-    int i = 0;
-    FtkListModelRanksInfo info = {0};
-    FtkListModelRanksInfo* p_info = &info;
-
-	return_val_if_fail(priv != NULL && model != NULL && list != NULL, RET_FAIL);
+	DECL_PRIV(thiz, priv);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
     return_val_if_fail(visible_start < total, RET_FAIL);
 
-    ftk_logi("%s-> visible_start=%d, visible_nr=%d, total=%d\n", __func__, visible_start, rows_nr, total);
+    ftk_logi("%s-> visible_start=%d, rows_nr=%d, total=%d\n", __func__, visible_start, rows_nr, total);
 
     for(r=0; r<rows_nr; r++)
     {
@@ -139,52 +130,6 @@ static Ret ftk_list_render_ranks_paint(FtkListRender* thiz, FtkCanvas* canvas, i
         }
     }
 
-#if 0
-    r = 0;
-    for(row = ftk_widget_child(list); row != NULL; row = ftk_widget_next(row))
-    {
-        if(ftk_widget_type(row) != FTK_LIST_ITEM) 
-        {
-            continue;
-        }
-
-        if(visible_start + r >= total)
-        {
-            c = 0;
-            for(cell = ftk_widget_child(row); cell != NULL; cell = ftk_widget_next(cell))
-            {
-                ftk_widget_set_visible(cell, 0);
-                c++;
-            }
-
-            ftk_widget_set_insensitive(row, 1);
-        }
-        else
-        {
-            c = 0;
-            for(cell = ftk_widget_child(row); cell != NULL; cell = ftk_widget_next(cell))
-            {
-                info.row_index = visible_start + r;
-                info.cell_index = c;
-                ftk_list_model_get_data(model, 0, (void**)&p_info);
-
-                if(info.text != NULL)
-                {
-                    ftk_widget_set_visible(cell, 1);
-                    ftk_widget_set_text(cell, info.text);
-                }
-
-                c++;
-            }
-
-            ftk_widget_set_insensitive(row, 0);
-        }
-
-        r++;
-    }
-#endif
-
-	
 	return RET_OK;
 }
 
