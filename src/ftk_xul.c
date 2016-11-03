@@ -123,6 +123,8 @@ typedef struct _FtkWidgetCreateInfo
 
     /* list */
     int visible_nr;
+    /* list_item */
+    FtkBitmap* bg_selected;
 
     int type;
     FtkBitmap* icon;
@@ -554,6 +556,8 @@ static FtkWidget* ftk_xul_list_item_create(FtkWidgetCreateInfo* info)
 
     widget = ftk_list_item_create(info->parent, info->x, info->y, info->w, info->h);
 
+    ftk_list_item_set_bg_selected(widget, info->bg_selected);
+
     return widget;
 }
 
@@ -861,6 +865,7 @@ static void ftk_xul_builder_init_widget_info(FtkXmlBuilder* thiz, const char** a
 	                    info->icon_position = atoi(value);
 	                }
 	            }
+                
 	            break;
 			}
 			case 'x':
@@ -1031,6 +1036,10 @@ static void ftk_xul_builder_init_widget_info(FtkXmlBuilder* thiz, const char** a
 					info->gc[FTK_WIDGET_FOCUSED].mask |= FTK_GC_BITMAP;
 					info->gc[FTK_WIDGET_FOCUSED].bitmap = ftk_xul_load_image(info->priv->callbacks,value);
 				}
+                else if(strcmp(name, "bg_selected") == 0)
+                {
+                    info->bg_selected = ftk_xul_load_image(info->priv->callbacks,value);
+                }
 				else
 				{
 					ftk_logd("%s: unknown %s\n", __func__, name);

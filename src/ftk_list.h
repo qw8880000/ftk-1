@@ -7,13 +7,14 @@
 FTK_BEGIN_DECLS
 
 FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int height);
-int ftk_list_update(FtkWidget* thiz);
-void ftk_list_set_visible_nr(FtkWidget* thiz, int nr);
-void ftk_list_page_prev(FtkWidget* thiz);
-void ftk_list_page_next(FtkWidget* thiz);
+Ret ftk_list_update(FtkWidget* thiz);
+Ret ftk_list_set_visible_nr(FtkWidget* thiz, int nr);
+Ret ftk_list_page_prev(FtkWidget* thiz);
+Ret ftk_list_page_next(FtkWidget* thiz);
 int ftk_list_get_total_page_num(FtkWidget* thiz);
 int ftk_list_get_cur_page_num(FtkWidget* thiz);
 FtkListModel* ftk_list_get_model(FtkWidget* thiz);
+Ret ftk_list_set_selected_item(FtkWidget* thiz, FtkWidget* item);
 
 FTK_END_DECLS
 

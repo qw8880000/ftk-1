@@ -43,6 +43,7 @@
 #include "ftk_globals.h"
 #include "ftk_window.h"
 #include "ftk_list.h"
+#include "ftk_list_item.h"
 #include "ftk_list_render.h"
 
 typedef struct _ListPrivInfo
@@ -59,6 +60,8 @@ typedef struct _ListPrivInfo
     FtkListModel*  model;
     FtkListRender* render;
 	/* FtkWidget* vscroll_bar; */
+
+    FtkWidget* selected_widget;
 	
 	void* listener_ctx;
 	FtkListener listener;
@@ -120,7 +123,7 @@ static void ftk_list_destroy(FtkWidget* thiz)
 	return;
 }
 
-int ftk_list_update(FtkWidget* thiz)
+Ret ftk_list_update(FtkWidget* thiz)
 {
 	DECL_PRIV0(thiz, priv);
 	int total = ftk_list_model_get_total(priv->model);
@@ -141,34 +144,39 @@ int ftk_list_update(FtkWidget* thiz)
     return RET_OK;
 }
 
-void ftk_list_set_visible_nr(FtkWidget* thiz, int nr)
+Ret ftk_list_set_visible_nr(FtkWidget* thiz, int nr)
 {
     DECL_PRIV0(thiz, priv);
-	return_if_fail(thiz != NULL && priv != NULL);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
 
     priv->visible_nr = nr;
+
+    return RET_OK;
 }
 
-void ftk_list_page_prev(FtkWidget* thiz)
+Ret ftk_list_page_prev(FtkWidget* thiz)
 {
     DECL_PRIV0(thiz, priv);
-	return_if_fail(thiz != NULL && priv != NULL);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
 
     priv->visible_start = (priv->visible_start - priv->visible_nr) > 0 ? (priv->visible_start - priv->visible_nr) : 0;
 
     ftk_list_update(thiz);
+
+    return RET_OK;
 }
 
-void ftk_list_page_next(FtkWidget* thiz)
+Ret ftk_list_page_next(FtkWidget* thiz)
 {
     DECL_PRIV0(thiz, priv);
     int total = ftk_list_model_get_total(priv->model);
-	return_if_fail(thiz != NULL && priv != NULL);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
     
     priv->visible_start = (priv->visible_start + priv->visible_nr) < total ? (priv->visible_start + priv->visible_nr) : priv->visible_start;
 
-    /* ftk_widget_invalidate(thiz); */
     ftk_list_update(thiz);
+
+    return RET_OK;
 }
 
 int ftk_list_get_total_page_num(FtkWidget* thiz)
@@ -204,6 +212,25 @@ FtkListModel* ftk_list_get_model(FtkWidget* thiz)
 	return_val_if_fail(priv != NULL, NULL);
 
 	return priv->model;
+}
+
+Ret ftk_list_set_selected_item(FtkWidget* thiz, FtkWidget* item)
+{
+	DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL && item != NULL, RET_FAIL);
+
+    if(priv->selected_widget == item)
+    {
+        return RET_OK;
+    }
+    else 
+    {
+        ftk_list_item_set_selected(priv->selected_widget, 0);
+        ftk_list_item_set_selected(item, 1);
+        priv->selected_widget = item;
+    }
+
+    return RET_OK;
 }
 
 

@@ -74,13 +74,11 @@ static Ret ftk_demo_list_on_button_clicked(void* ctx, void* obj)
         case IDX_PREV:
         {
             ftk_list_page_prev(list);
-            ftk_widget_set_active(button, 1);
             break;
         }
         case IDX_NEXT:
         {
             ftk_list_page_next(list);
-            ftk_widget_set_active(button, 1);
             break;
         }
         case IDX_REMOVE:

@@ -41,12 +41,29 @@
 #include "ftk_event.h"
 #include "ftk_globals.h"
 #include "ftk_window.h"
+#include "ftk_list.h"
 
 typedef struct _ListItemPrivInfo
 {
+    FtkBitmap* bg_selected;
+
+    int is_selected;
+
 	void* listener_ctx;
 	FtkListener listener;
 }PrivInfo;
+
+Ret ftk_list_item_set_selected(FtkWidget* thiz, int selected)
+{
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL, RET_FAIL);
+
+    priv->is_selected = selected; 
+
+    ftk_widget_invalidate(thiz);
+
+    return RET_OK;
+}
 
 static Ret ftk_list_item_on_event(FtkWidget* thiz, FtkEvent* event)
 {
@@ -62,9 +79,13 @@ static Ret ftk_list_item_on_event(FtkWidget* thiz, FtkEvent* event)
 			break;
 		}
 		case FTK_EVT_MOUSE_UP:
+        {
+            /* ftk_widget_set_active(thiz, 0); */
+            break;
+        }
 		case FTK_EVT_MOUSE_DOWN:
 		{
-			/* ret = ftk_list_view_on_mouse_event(thiz, event); */
+            ftk_list_set_selected_item(ftk_widget_parent(thiz), thiz);
 			break;
 		}
 		case FTK_EVT_RESIZE:
@@ -84,6 +105,12 @@ static void ftk_list_item_destroy(FtkWidget* thiz)
 	if(thiz != NULL)
 	{
 		DECL_PRIV0(thiz, priv);
+
+        if(priv->bg_selected != NULL)
+        {
+            ftk_bitmap_unref(priv->bg_selected);
+        }
+
 		FTK_ZFREE(priv, sizeof(PrivInfo));
 	}
 
@@ -92,8 +119,25 @@ static void ftk_list_item_destroy(FtkWidget* thiz)
 
 static Ret ftk_list_item_on_paint(FtkWidget* thiz)
 {
-	/* FTK_BEGIN_PAINT(x, y, width, height, canvas); */
-	/* FTK_END_PAINT(); */
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL, RET_FAIL);
+    FTK_BEGIN_PAINT(x, y, width, height, canvas);
+
+    if(priv->is_selected)
+    {
+        ftk_logi("paint selected_widget\n");
+        ftk_canvas_draw_bg_image(canvas, priv->bg_selected, FTK_BG_FOUR_CORNER, x, y, width, height);
+    }
+
+    FTK_END_PAINT();
+}
+
+Ret ftk_list_item_set_bg_selected(FtkWidget* thiz, FtkBitmap* bitmap)
+{
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL && bitmap != NULL, RET_FAIL);
+
+    priv->bg_selected = bitmap;
 
     return RET_OK;
 }
@@ -113,6 +157,8 @@ FtkWidget* ftk_list_item_create(FtkWidget* parent, int x, int y, int width, int 
 
 		ftk_widget_init(thiz, FTK_LIST_ITEM, 0, x, y, width, height, FTK_ATTR_BG_FOUR_CORNER);
 		ftk_widget_append_child(parent, thiz);
+
+        priv->bg_selected = NULL;
 	}
 	else
 	{

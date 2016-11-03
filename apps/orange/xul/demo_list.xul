@@ -12,6 +12,7 @@
             bg_image[normal]="list_selector_background_normal.png"
             bg_image[active]="list_selector_background_pressed.png"
             bg_image[focused]="list_selector_background_focus.png"
+            bg_selected="list_selector_background_focus.png"
             bg[normal]="ff00ff00">
 
             <image visible="1" w="32" h="32"
@@ -40,6 +41,7 @@
             bg_image[normal]="list_selector_background_normal.png"
             bg_image[active]="list_selector_background_pressed.png"
             bg_image[focused]="list_selector_background_focus.png"
+            bg_selected="list_selector_background_focus.png"
             bg[normal]="ff0ffff0">
 
             <image visible="1" w="32" h="32"
@@ -67,6 +69,7 @@
             bg_image[normal]="list_selector_background_normal.png"
             bg_image[active]="list_selector_background_pressed.png"
             bg_image[focused]="list_selector_background_focus.png"
+            bg_selected="list_selector_background_focus.png"
             bg[normal]="ff0ffff0">
 
             <image visible="1" w="32" h="32"
@@ -94,6 +97,7 @@
             bg_image[normal]="list_selector_background_normal.png"
             bg_image[active]="list_selector_background_pressed.png"
             bg_image[focused]="list_selector_background_focus.png"
+            bg_selected="list_selector_background_focus.png"
             bg[normal]="ff0ffff0">
 
             <image visible="1" w="32" h="32"
@@ -121,6 +125,7 @@
             bg_image[normal]="list_selector_background_normal.png"
             bg_image[active]="list_selector_background_pressed.png"
             bg_image[focused]="list_selector_background_focus.png"
+            bg_selected="list_selector_background_focus.png"
             bg[normal]="ff0ffff0">
 
             <image visible="1" w="32" h="32"
