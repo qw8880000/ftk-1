@@ -5,7 +5,7 @@ FTK_BEGIN_DECLS
 
 #include "ftk_list_render.h"
 
-typedef Ret (*FtkListRenderPaintListener)(void* ctx, int row, int col, FtkWidget* cell);
+typedef Ret (*FtkListRenderPaintListener)(void* ctx, int pos, int row, int col, FtkWidget* cell);
 
 FtkListRender* ftk_list_render_ranks_create(void);
 

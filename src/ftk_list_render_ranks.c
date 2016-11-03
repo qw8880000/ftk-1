@@ -55,7 +55,7 @@ typedef struct _ListRenderRanksPrivInfo
     void* listerner_ctx;
 }PrivInfo;
 
-static Ret ftk_list_render_ranks_paint_row(FtkListRender* thiz, int visible_start, int row, int visible)
+static Ret ftk_list_render_ranks_paint_row(FtkListRender* thiz, int visible_pos, int row, int visible)
 {
 	DECL_PRIV(thiz, priv);
     FtkWidget* list = priv->list;
@@ -75,19 +75,23 @@ static Ret ftk_list_render_ranks_paint_row(FtkListRender* thiz, int visible_star
         for(c=0; c<ftk_list_get_cols_nr(list); c++) 
         {
             FtkWidget* cell = ftk_list_get_cell(list, row, c);
-            info.row_index = visible_start + row;
+            info.row_index = visible_pos;
             info.cell_index = c;
             ftk_list_model_get_data(model, 0, (void**)&p_info);
 
+            ftk_widget_set_visible(cell, 1);
             if(info.text != NULL)
             {
-                ftk_widget_set_visible(cell, 1);
                 ftk_widget_set_text(cell, info.text);
+            }
+            else
+            {
+                ftk_widget_set_text(cell, " ");
             }
 
             if(priv->paint_listerner != NULL)
             {
-                priv->paint_listerner(priv->listerner_ctx, visible_start, c, cell);
+                priv->paint_listerner(priv->listerner_ctx, visible_pos, row, c, cell);
             }
         }
 
@@ -119,24 +123,24 @@ static Ret ftk_list_render_ranks_init(FtkListRender* thiz, FtkListModel* model, 
 }
 
 
-static Ret ftk_list_render_ranks_paint(FtkListRender* thiz, FtkCanvas* canvas, int visible_start, int rows_nr, int total, int w, int h)
+static Ret ftk_list_render_ranks_paint(FtkListRender* thiz, FtkCanvas* canvas, int visible_start, int visible_nr, int total, int w, int h)
 {
     int r = 0;
 	DECL_PRIV(thiz, priv);
 	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
     return_val_if_fail(visible_start < total, RET_FAIL);
 
-    ftk_logi("%s-> visible_start=%d, rows_nr=%d, total=%d\n", __func__, visible_start, rows_nr, total);
+    ftk_logi("%s-> visible_start=%d, visible_nr=%d, total=%d\n", __func__, visible_start, visible_nr, total);
 
-    for(r=0; r<rows_nr; r++)
+    for(r=0; r<visible_nr; r++)
     {
         if(visible_start + r < total)     
         {
-            ftk_list_render_ranks_paint_row(thiz, visible_start, r, 1);
+            ftk_list_render_ranks_paint_row(thiz, visible_start + r, r, 1);
         }
         else
         {
-            ftk_list_render_ranks_paint_row(thiz, visible_start, r, 0);
+            ftk_list_render_ranks_paint_row(thiz, visible_start + r, r, 0);
         }
     }
 
