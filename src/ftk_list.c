@@ -48,19 +48,14 @@
 
 typedef struct _ListPrivInfo
 {
-    int current;
-    int visible_nr;
+    int rows_nr;
+    int cols_nr;
     int visible_start;
-	/* int item_height; */
 
-	/* int is_active; */
-	/* int top_margin; */
-	/* int botton_margin; */
-	/* int scrolled_by_me; */
     FtkListModel*  model;
     FtkListRender* render;
-	/* FtkWidget* vscroll_bar; */
 
+    int selected;
     FtkWidget* selected_widget;
 	
 	void* listener_ctx;
@@ -91,7 +86,7 @@ static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
 		{
 			/* if(priv->item_height > 0) */
 			/* { */
-				/* priv->visible_nr = ftk_widget_height(thiz)/priv->item_height; */
+				/* priv->rows_nr = ftk_widget_height(thiz)/priv->item_height; */
 			/* } */
 			break;
 		}
@@ -127,31 +122,97 @@ Ret ftk_list_update(FtkWidget* thiz)
 {
 	DECL_PRIV0(thiz, priv);
 	int total = ftk_list_model_get_total(priv->model);
-
-    if((priv->visible_start + priv->visible_nr) >= total)
+#if 0
+    if((priv->visible_start + priv->rows_nr) >= total)
     {
-        int visible_start = total - priv->visible_nr;
+        int visible_start = total - priv->rows_nr;
         priv->visible_start = (visible_start >= 0) ? visible_start : 0;
     }
 
-	if(priv->current >= total)
+	if(priv->selected >= total)
 	{
-		priv->current = total - 1;
+		priv->selected = total - 1;
 	}
 
-    ftk_list_render_paint(priv->render, NULL, priv->visible_start, priv->visible_nr, 0, 0, 0);
+#endif
+
+    ftk_list_render_paint(priv->render, NULL, priv->visible_start, priv->rows_nr, total, 0, 0);
 
     return RET_OK;
 }
 
-Ret ftk_list_set_visible_nr(FtkWidget* thiz, int nr)
+Ret ftk_list_set_rows_nr(FtkWidget* thiz, int nr)
 {
     DECL_PRIV0(thiz, priv);
 	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
 
-    priv->visible_nr = nr;
+    priv->rows_nr = nr;
 
     return RET_OK;
+}
+
+int ftk_list_get_rows_nr(FtkWidget* thiz)
+{
+    DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL && priv != NULL, 0);
+
+    return priv->rows_nr;
+}
+
+int ftk_list_get_cols_nr(FtkWidget* thiz)
+{
+    DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL && priv != NULL, 0);
+
+    return priv->cols_nr;
+}
+
+Ret ftk_list_set_cols_nr(FtkWidget* thiz, int nr)
+{
+    DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+
+    priv->cols_nr = nr;
+
+    return RET_OK;
+}
+
+FtkWidget* ftk_list_get_item(FtkWidget* thiz, int row)
+{
+    int r = 0;
+    FtkWidget* iter = ftk_widget_child(thiz);
+    DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL && priv != NULL, NULL);
+
+    for(; iter != NULL; iter = ftk_widget_next(iter))
+    {
+        if(r++ == row)
+        {
+            return iter;
+        }
+    }
+
+    return NULL;
+}
+
+FtkWidget* ftk_list_get_cell(FtkWidget* thiz, int row, int col)
+{
+    int c = 0;
+    FtkWidget* item = ftk_list_get_item(thiz, row);
+    FtkWidget* iter = ftk_widget_child(item);
+    DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL && priv != NULL, NULL);
+	return_val_if_fail(item != NULL, NULL);
+
+    for(; iter != NULL; iter = ftk_widget_next(iter))
+    {
+        if(c++ == col)
+        {
+            return iter;
+        }
+    }
+
+    return NULL;
 }
 
 Ret ftk_list_page_prev(FtkWidget* thiz)
@@ -159,7 +220,7 @@ Ret ftk_list_page_prev(FtkWidget* thiz)
     DECL_PRIV0(thiz, priv);
 	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
 
-    priv->visible_start = (priv->visible_start - priv->visible_nr) > 0 ? (priv->visible_start - priv->visible_nr) : 0;
+    priv->visible_start = (priv->visible_start - priv->rows_nr) > 0 ? (priv->visible_start - priv->rows_nr) : 0;
 
     ftk_list_update(thiz);
 
@@ -172,7 +233,7 @@ Ret ftk_list_page_next(FtkWidget* thiz)
     int total = ftk_list_model_get_total(priv->model);
 	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
     
-    priv->visible_start = (priv->visible_start + priv->visible_nr) < total ? (priv->visible_start + priv->visible_nr) : priv->visible_start;
+    priv->visible_start = (priv->visible_start + priv->rows_nr) < total ? (priv->visible_start + priv->rows_nr) : priv->visible_start;
 
     ftk_list_update(thiz);
 
@@ -185,12 +246,12 @@ int ftk_list_get_total_page_num(FtkWidget* thiz)
     int total = ftk_list_model_get_total(priv->model);
 	return_val_if_fail(thiz != NULL && priv != NULL, 0);
 
-    if(priv->visible_nr == 0)
+    if(priv->rows_nr == 0)
     {
         return 0;
     }
 
-    return (total % priv->visible_nr == 0) ? (total / priv->visible_nr) : (total / priv->visible_nr + 1);
+    return (total % priv->rows_nr == 0) ? (total / priv->rows_nr) : (total / priv->rows_nr + 1);
 }
 
 int ftk_list_get_cur_page_num(FtkWidget* thiz)
@@ -198,12 +259,12 @@ int ftk_list_get_cur_page_num(FtkWidget* thiz)
     DECL_PRIV0(thiz, priv);
 	return_val_if_fail(thiz != NULL && priv != NULL, 0);
 
-    if(priv->visible_nr == 0)
+    if(priv->rows_nr == 0)
     {
         return 0;
     }
 
-    return priv->visible_start / priv->visible_nr;
+    return priv->visible_start / priv->rows_nr;
 }
 
 FtkListModel* ftk_list_get_model(FtkWidget* thiz)
@@ -245,7 +306,7 @@ static Ret ftk_list_init(FtkWidget* thiz, FtkListModel* model, FtkListRender* re
     priv->model = model;
     priv->render = render;
     priv->visible_start = 0;
-    priv->current = 0;
+    priv->selected = 0;
 
 	ftk_list_render_init(render, model, thiz);
 
@@ -266,7 +327,6 @@ FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int heigh
 		thiz->destroy  = ftk_list_destroy;
 
         ftk_widget_init(thiz, FTK_LIST, 0, x, y, width, height, FTK_ATTR_INSENSITIVE|FTK_ATTR_BG_FOUR_CORNER);
-        /* ftk_widget_init(thiz, FTK_LIST, 0, x, y, width, height, FTK_ATTR_BG_FOUR_CORNER); */
         ftk_widget_append_child(parent, thiz);
 
         ftk_list_init(thiz, ftk_list_model_ranks_create(), ftk_list_render_ranks_create());

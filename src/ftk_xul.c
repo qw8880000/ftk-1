@@ -122,7 +122,8 @@ typedef struct _FtkWidgetCreateInfo
 	int readonly;
 
     /* list */
-    int visible_nr;
+    int rows;
+    int cols;
     /* list_item */
     FtkBitmap* bg_selected;
 
@@ -542,9 +543,13 @@ static FtkWidget* ftk_xul_list_create(FtkWidgetCreateInfo* info)
 		ftk_widget_set_text(widget, ftk_xul_translate_text(info->priv->callbacks, info->value));
 	}
 
-    if(info->visible_nr > 0)
+    if(info->rows > 0)
     {
-        ftk_list_set_visible_nr(widget, info->visible_nr);
+        ftk_list_set_rows_nr(widget, info->rows);
+    }
+    if(info->cols > 0)
+    {
+        ftk_list_set_cols_nr(widget, info->cols);
     }
 
     return widget;
@@ -970,12 +975,17 @@ static void ftk_xul_builder_init_widget_info(FtkXmlBuilder* thiz, const char** a
 				{
 					info->visible = atoi(value);
 				}
-                else if(strcmp(name, "visible_nr") == 0) /* visible_nr */
-                {
-                    info->visible_nr = atoi(value);
-                }
+                
 				break;
 			}
+            case 'r':
+            {
+                if(strcmp(name, "rows") == 0) /* rows */
+                {
+                    info->rows = atoi(value);
+                }
+                break;
+            }
 			case 'm':
 			{
 				/*max*/
@@ -990,8 +1000,15 @@ static void ftk_xul_builder_init_widget_info(FtkXmlBuilder* thiz, const char** a
 			}
 			case 'c':
 			{
-				/*checked*/
-				info->checked = atoi(value);
+                if(strcmp(name, "cols") == 0)   /* cols */
+                {
+                    info->cols = atoi(value);
+                }
+                else
+                {
+                    /*checked*/
+                    info->checked = atoi(value);
+                }
 				break;
 			}
 			case 'b':

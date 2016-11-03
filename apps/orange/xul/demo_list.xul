@@ -5,7 +5,8 @@
         x_attr="X_CENTER_IN_PARENT"
         bg[normal]="ffff0000" visible="1" 
         bg_image[disable]="list_view_bg.png"
-        visible_nr="5">
+        rows="5"
+        cols="3">
 
         <list_item visible="1" y="5" w="$pw-10" h="50" 
             x_attr="X_CENTER_IN_PARENT"
