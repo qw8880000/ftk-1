@@ -41,7 +41,7 @@ static void ftk_demo_list_init(FtkWidget* win)
     FtkWidget* list = ftk_widget_lookup(win, IDX_LIST);
     char temp[32] = {0};
 
-    for(r=0; r<20; r++)
+    for(r=0; r<17; r++)
     {
         info.row_index = r;
         info.cell_index = 0;

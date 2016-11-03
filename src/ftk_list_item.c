@@ -93,6 +93,13 @@ static Ret ftk_list_item_on_event(FtkWidget* thiz, FtkEvent* event)
 		{
 			break;
 		}
+        case FTK_EVT_MOUSE_MOVE:
+        {
+            /* int x = event->u.mouse.x; */
+            /* int y = event->u.mouse.y; */
+            /* ftk_logi("--> x=%d,y=%d\n", x, y); */
+            break;
+        }
 		default:break;
 	}
 

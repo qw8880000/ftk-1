@@ -265,7 +265,8 @@ FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int heigh
 		thiz->on_paint = ftk_list_on_paint;
 		thiz->destroy  = ftk_list_destroy;
 
-		ftk_widget_init(thiz, FTK_LIST, 0, x, y, width, height, FTK_ATTR_INSENSITIVE|FTK_ATTR_BG_FOUR_CORNER);
+        ftk_widget_init(thiz, FTK_LIST, 0, x, y, width, height, FTK_ATTR_INSENSITIVE|FTK_ATTR_BG_FOUR_CORNER);
+        /* ftk_widget_init(thiz, FTK_LIST, 0, x, y, width, height, FTK_ATTR_BG_FOUR_CORNER); */
         ftk_widget_append_child(parent, thiz);
 
         ftk_list_init(thiz, ftk_list_model_ranks_create(), ftk_list_render_ranks_create());
