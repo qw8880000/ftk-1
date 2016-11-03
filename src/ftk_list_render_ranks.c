@@ -50,6 +50,9 @@ typedef struct _ListRenderRanksPrivInfo
 {
 	FtkListModel* model;
 	FtkWidget* list;
+
+    FtkListRenderPaintListener paint_listerner;
+    void* listerner_ctx;
 }PrivInfo;
 
 static Ret ftk_list_render_ranks_paint_row(FtkListRender* thiz, int visible_start, int row, int visible)
@@ -71,16 +74,23 @@ static Ret ftk_list_render_ranks_paint_row(FtkListRender* thiz, int visible_star
 
         for(c=0; c<ftk_list_get_cols_nr(list); c++) 
         {
+            FtkWidget* cell = ftk_list_get_cell(list, row, c);
             info.row_index = visible_start + row;
             info.cell_index = c;
             ftk_list_model_get_data(model, 0, (void**)&p_info);
 
             if(info.text != NULL)
             {
-                ftk_widget_set_visible(ftk_list_get_cell(list, row, c), 1);
-                ftk_widget_set_text(ftk_list_get_cell(list, row, c), info.text);
+                ftk_widget_set_visible(cell, 1);
+                ftk_widget_set_text(cell, info.text);
+            }
+
+            if(priv->paint_listerner != NULL)
+            {
+                priv->paint_listerner(priv->listerner_ctx, visible_start, c, cell);
             }
         }
+
 
         ftk_widget_set_insensitive(ftk_list_get_item(list, row), 0);
     }

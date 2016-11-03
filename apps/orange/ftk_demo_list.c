@@ -34,6 +34,10 @@ enum{
 
 };
 
+static void ftk_demo_list_clear(FtkWidget* win)
+{
+}
+
 static void ftk_demo_list_init(FtkWidget* win)
 {
     int r = 0;
@@ -87,6 +91,7 @@ static Ret ftk_demo_list_on_button_clicked(void* ctx, void* obj)
         }
         case IDX_CLEAR:
         {
+ftk_demo_list_clear(win);
             break;
         }
         default:break;
