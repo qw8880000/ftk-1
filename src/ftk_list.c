@@ -53,9 +53,6 @@ typedef struct _ListPrivInfo
     int visible_start;
     int total;
 
-    /* FtkListModel*  model; */
-    FtkListRender* render;
-
     /* int selected; */
     FtkWidget* selected_widget;
 	
@@ -104,7 +101,7 @@ static Ret ftk_list_on_paint(FtkWidget* thiz)
 {
 	DECL_PRIV0(thiz, priv);
 
-    ftk_logi("%s\n", __func__);
+    /* ftk_logi("%s\n", __func__); */
 
     return RET_OK;
 }
@@ -138,7 +135,7 @@ static Ret ftk_list_paint_row(FtkWidget* thiz, int visible_pos, int row, int vis
 	DECL_PRIV0(thiz, priv);
     return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
 
-    ftk_logi("%s\n", __func__);
+    /* ftk_logi("%s\n", __func__); */
 
     for(c=0; c<ftk_list_get_cols_nr(thiz); c++) 
     {
@@ -164,7 +161,7 @@ static Ret ftk_list_paint(FtkWidget* thiz, int visible_start, int visible_nr, in
 	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
     return_val_if_fail(visible_start < total || (visible_start == 0 && total == 0), RET_FAIL);
 
-    ftk_logi("%s-> visible_start=%d, visible_nr=%d, total=%d\n", __func__, visible_start, visible_nr, total);
+    /* ftk_logi("%s-> visible_start=%d, visible_nr=%d, total=%d\n", __func__, visible_start, visible_nr, total); */
 
     for(r=0; r<visible_nr; r++)
     {
@@ -322,6 +319,24 @@ Ret ftk_list_reset(FtkWidget* thiz)
     ftk_list_item_set_selected(priv->selected_widget, 0);
     priv->selected_widget = NULL;
     priv->visible_start = 0;
+    priv->total = 0;
+
+    ftk_list_update(thiz);
+
+    return RET_OK;
+}
+
+Ret ftk_list_remove(FtkWidget* thiz)
+{
+    DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+
+    priv->total = priv->total > 0 ? priv->total - 1: 0;
+
+    if(priv->visible_start >= priv->total)
+    {
+        priv->visible_start = (priv->visible_start - priv->rows_nr > 0) ? (priv->visible_start - priv->rows_nr) : 0;
+    }
 
     ftk_list_update(thiz);
 
@@ -390,7 +405,10 @@ FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int heigh
         ftk_widget_init(thiz, FTK_LIST, 0, x, y, width, height, FTK_ATTR_INSENSITIVE|FTK_ATTR_BG_FOUR_CORNER);
         ftk_widget_append_child(parent, thiz);
 
+        priv->selected_widget = NULL;
         priv->visible_start = 0;
+        priv->total = 0;
+        priv->rows_nr = 0;
 	}
 	else
 	{

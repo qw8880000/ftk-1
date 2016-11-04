@@ -40,9 +40,24 @@ static void ftk_demo_list_clear(FtkWidget* win)
     ftk_list_reset(list);
 }
 
+static void ftk_demo_list_remove(FtkWidget* win)
+{
+    FtkWidget* list = ftk_widget_lookup(win, IDX_LIST);
+    ftk_list_remove(list);
+}
+
 Ret demo_list_paint_row(FtkWidget* thiz, void* ctx, int pos, int row, int col, FtkWidget* cell, int visible)
 {
-    ftk_logi("%s, %d,%d,%d\n", __func__, pos, row, col);
+    FtkWidget* list = thiz;
+    char* buffer[128];
+
+    /* ftk_logi("%s, %d,%d,%d\n", __func__, pos, row, col); */
+    ftk_logi("cur page = %d, total = %d\n", ftk_list_get_cur_page_num(list), ftk_list_get_total_page_num(list));
+    if(col == 1)
+    {
+        snprintf(buffer, sizeof(buffer), "%d.haha", pos);
+        ftk_widget_set_text(cell, buffer);
+    }
     return RET_OK;
 }
 
@@ -52,6 +67,8 @@ static void ftk_demo_list_init(FtkWidget* win)
 
     ftk_list_set_total(list, 10);
     ftk_list_set_paint_listener(list, demo_list_paint_row, win);
+
+    ftk_list_update(list);
 }
 
 static Ret ftk_demo_list_on_button_clicked(void* ctx, void* obj)
@@ -74,11 +91,12 @@ static Ret ftk_demo_list_on_button_clicked(void* ctx, void* obj)
         }
         case IDX_REMOVE:
         {
+            ftk_demo_list_remove(win);
             break;
         }
         case IDX_CLEAR:
         {
-ftk_demo_list_clear(win);
+            ftk_demo_list_clear(win);
             break;
         }
         default:break;
