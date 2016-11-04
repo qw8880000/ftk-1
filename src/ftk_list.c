@@ -44,7 +44,6 @@
 #include "ftk_window.h"
 #include "ftk_list.h"
 #include "ftk_list_item.h"
-#include "ftk_list_render.h"
 
 typedef struct _ListPrivInfo
 {
