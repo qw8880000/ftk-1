@@ -154,6 +154,7 @@ typedef enum _FtkWidgetType
 	FTK_KEY_BOARD,
     FTK_LIST,
     FTK_LIST_ITEM,
+    FTK_DIV,
 	FTK_WIDGET_TYPE_NR
 }FtkWidgetType;
 

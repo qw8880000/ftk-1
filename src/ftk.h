@@ -79,6 +79,7 @@ extern "C" {
 #include "ftk_tab.h"
 #include "ftk_list.h"
 #include "ftk_list_item.h"
+#include "ftk_div.h"
 
 FTK_BEGIN_DECLS
 
