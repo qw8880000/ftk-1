@@ -102,7 +102,9 @@ static Ret ftk_list_render_ranks_paint_row(FtkListRender* thiz, int visible_pos,
     {
         for(c=0; c<ftk_list_get_cols_nr(list); c++) 
         {
-            ftk_widget_set_visible(ftk_list_get_cell(list, row, c), 0);
+            FtkWidget* cell = ftk_list_get_cell(list, row, c);
+            ftk_widget_set_visible(cell, 0);
+            ftk_widget_set_text(cell, " ");
         }
 
         ftk_widget_set_insensitive(ftk_list_get_item(list, row), 1);
@@ -128,7 +130,7 @@ static Ret ftk_list_render_ranks_paint(FtkListRender* thiz, FtkCanvas* canvas, i
     int r = 0;
 	DECL_PRIV(thiz, priv);
 	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
-    return_val_if_fail(visible_start < total, RET_FAIL);
+    return_val_if_fail(visible_start < total || (visible_start == 0 && total == 0), RET_FAIL);
 
     ftk_logi("%s-> visible_start=%d, visible_nr=%d, total=%d\n", __func__, visible_start, visible_nr, total);
 

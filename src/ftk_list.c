@@ -55,7 +55,7 @@ typedef struct _ListPrivInfo
     FtkListModel*  model;
     FtkListRender* render;
 
-    int selected;
+    /* int selected; */
     FtkWidget* selected_widget;
 	
 	void* listener_ctx;
@@ -99,6 +99,8 @@ static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
 static Ret ftk_list_on_paint(FtkWidget* thiz)
 {
 	DECL_PRIV0(thiz, priv);
+
+    ftk_logi("%s\n", __func__);
 
     return RET_OK;
 }
@@ -146,6 +148,8 @@ Ret ftk_list_update(FtkWidget* thiz)
     }
 
     ftk_list_render_paint(priv->render, NULL, priv->visible_start, priv->rows_nr, total, 0, 0);
+
+    ftk_widget_invalidate(thiz);
 
     return RET_OK;
 }
@@ -254,6 +258,22 @@ Ret ftk_list_page_next(FtkWidget* thiz)
     return RET_OK;
 }
 
+Ret ftk_list_reset(FtkWidget* thiz)
+{
+    DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+
+    ftk_list_model_reset(priv->model);
+
+    ftk_list_item_set_selected(priv->selected_widget, 0);
+    priv->selected_widget = NULL;
+    priv->visible_start = 0;
+
+    ftk_list_update(thiz);
+
+    return RET_OK;
+}
+
 int ftk_list_get_total_page_num(FtkWidget* thiz)
 {
     DECL_PRIV0(thiz, priv);
@@ -320,7 +340,7 @@ static Ret ftk_list_init(FtkWidget* thiz, FtkListModel* model, FtkListRender* re
     priv->model = model;
     priv->render = render;
     priv->visible_start = 0;
-    priv->selected = 0;
+    /* priv->selected = 0; */
 
 	ftk_list_render_init(render, model, thiz);
 

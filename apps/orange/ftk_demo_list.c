@@ -36,6 +36,8 @@ enum{
 
 static void ftk_demo_list_clear(FtkWidget* win)
 {
+    FtkWidget* list = ftk_widget_lookup(win, IDX_LIST);
+ftk_list_reset(list);
 }
 
 static void ftk_demo_list_init(FtkWidget* win)

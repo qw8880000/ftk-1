@@ -10,6 +10,7 @@ FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int heigh
 Ret ftk_list_update(FtkWidget* thiz);
 Ret ftk_list_page_prev(FtkWidget* thiz);
 Ret ftk_list_page_next(FtkWidget* thiz);
+Ret ftk_list_reset(FtkWidget* thiz);
 
 int ftk_list_get_total_page_num(FtkWidget* thiz);
 int ftk_list_get_cur_page_num(FtkWidget* thiz);
