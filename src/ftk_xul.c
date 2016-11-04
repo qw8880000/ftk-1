@@ -47,29 +47,41 @@ typedef struct _XulPrivInfo
 	FtkXulCallbacks* callbacks;
 }PrivInfo;
 
-#define X_FIX_LEFT   0
-#define X_FIX_RIGHT   1
-#define X_SCALE   2
-#define X_CENTER_IN_PARENT   3
-#define X_LEFT_IN_PARENT     4
-#define X_RIGHT_IN_PARENT    5
-#define X_FLOAT_LEFT    6
+enum
+{
+    X_FIX_LEFT         = 0,
+    X_FIX_RIGHT        = 1,
+    X_SCALE            = 2,
+    X_CENTER_IN_PARENT = 3,
+    X_LEFT_IN_PARENT   = 4,
+    X_RIGHT_IN_PARENT  = 5,
+    X_LEFT_TO_PREV     = 6,
+    X_RIGHT_TO_PREV    = 7,
+};
 
-#define Y_FIX_TOP   0
-#define Y_FIX_BOTTOM   1
-#define Y_SCALE   2
-#define Y_CENTER_IN_PARENT   3
-#define Y_TOP_IN_PARENT      4
-#define Y_BOTTOM_IN_PARENT   5
-#define Y_FLOAT_TOP    6
+enum{
+    Y_FIX_TOP          = 0,
+    Y_FIX_BOTTOM       = 1,
+    Y_SCALE            = 2,
+    Y_CENTER_IN_PARENT = 3,
+    Y_TOP_IN_PARENT    = 4,
+    Y_BOTTOM_IN_PARENT = 5,
+    Y_TOP_TO_PREV      = 6,
+    Y_BOTTOM_TO_PREV   = 7,
+};
 
-#define HEIGHT_FIX   0
-#define HEIGHT_SCALE   1
-#define HEIGHT_FILL_PARENT   2
+enum{
+    H_FIX         = 0,
+    H_SCALE       = 1,
+    H_FILL_PARENT = 2,
+};
 
-#define WIDTH_FIX   0
-#define WIDTH_SCALE   1
-#define WIDTH_FILL_PARENT   2
+enum
+{
+    W_FIX          = 0,
+    W_SCALE        = 1,
+    W_FILL_PARENT  = 2,
+};
 
 
 typedef struct _FtkWidgetCreateInfo
@@ -744,7 +756,8 @@ static const VarConst s_var_conts[] =
     {"X_CENTER_IN_PARENT", X_CENTER_IN_PARENT},
     {"X_LEFT_IN_PARENT",   X_LEFT_IN_PARENT},
     {"X_RIGHT_IN_PARENT",  X_RIGHT_IN_PARENT},
-    {"X_FLOAT_LEFT",       X_FLOAT_LEFT},
+    {"X_LEFT_TO_PREV",     X_LEFT_TO_PREV},
+    {"X_RIGHT_TO_PREV",    X_RIGHT_TO_PREV},
 
     {"Y_FIX_TOP",          Y_FIX_TOP},
     {"Y_FIX_BOTTOM",       Y_FIX_BOTTOM},
@@ -752,15 +765,16 @@ static const VarConst s_var_conts[] =
     {"Y_CENTER_IN_PARENT", Y_CENTER_IN_PARENT},
     {"Y_TOP_IN_PARENT",    Y_TOP_IN_PARENT},
     {"Y_BOTTOM_IN_PARENT", Y_BOTTOM_IN_PARENT},
-    {"Y_FLOAT_TOP",        Y_FLOAT_TOP},
+    {"Y_TOP_TO_PREV",      Y_TOP_TO_PREV},
+    {"Y_BOTTOM_TO_PREV",   Y_BOTTOM_TO_PREV},
 
-    {"HEIGHT_FIX",         HEIGHT_FIX},
-    {"HEIGHT_SCALE",       HEIGHT_SCALE},
-    {"HEIGHT_FILL_PARENT", HEIGHT_FILL_PARENT},
+    {"H_FIX",              H_FIX},
+    {"H_SCALE",            H_SCALE},
+    {"H_FILL_PARENT",      H_FILL_PARENT},
 
-    {"WIDTH_FIX",          WIDTH_FIX},
-    {"WIDTH_SCALE",        WIDTH_SCALE},
-    {"WIDTH_FILL_PARENT",  WIDTH_FILL_PARENT},
+    {"W_FIX",              W_FIX},
+    {"W_SCALE",            W_SCALE},
+    {"W_FILL_PARENT",      W_FILL_PARENT},
 
 	{NULL, 0},
 };
@@ -1187,9 +1201,14 @@ static void ftk_xul_relayout_widget(FtkWidgetCreateInfo* info, FtkWidget* widget
 			x = pw - w;
 			break;
 		}
-        case X_FLOAT_LEFT:
+        case X_LEFT_TO_PREV:
         {
             x = prev_x + prev_w;
+            break;
+        }
+        case X_RIGHT_TO_PREV:
+        {
+            x = (pw - prev_x - w) > 0 ? (pw - prev_x - w) : 0;
             break;
         }
 		default:break;
@@ -1222,9 +1241,14 @@ static void ftk_xul_relayout_widget(FtkWidgetCreateInfo* info, FtkWidget* widget
 			y = ph - h;
 			break;
 		}
-        case Y_FLOAT_TOP:
+        case Y_TOP_TO_PREV:
         {
             y = prev_y + prev_h;
+            break;
+        }
+        case Y_BOTTOM_TO_PREV:
+        {
+            y = (ph - prev_y - h) > 0 ? (ph - prev_h - h) : 0;
             break;
         }
 		default:break;
@@ -1232,12 +1256,12 @@ static void ftk_xul_relayout_widget(FtkWidgetCreateInfo* info, FtkWidget* widget
 	
 	switch(info->w_attr) 
 	{
-		case WIDTH_SCALE:
+		case W_SCALE:
 		{
 			w = pw * info->w_param;
 			break;
 		}
-		case WIDTH_FILL_PARENT: 
+		case W_FILL_PARENT: 
 		{
 			w = pw;
 			x = 0;
@@ -1248,12 +1272,12 @@ static void ftk_xul_relayout_widget(FtkWidgetCreateInfo* info, FtkWidget* widget
 
 	switch(info->h_attr) 
 	{
-		case HEIGHT_SCALE:
+		case H_SCALE:
 		{
 			h = ph * info->w_param;
 			break;
 		}
-		case HEIGHT_FILL_PARENT: 
+		case H_FILL_PARENT: 
 		{
 			h = ph;
 			y = 0;

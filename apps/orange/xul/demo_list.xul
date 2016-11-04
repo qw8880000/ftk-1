@@ -22,7 +22,7 @@
                 value="mime_audio.png"/>
 
             <label visible="1" w="$pw-32-38" h="22"
-                x_attr="X_FLOAT_LEFT"
+                x_attr="X_LEFT_TO_PREV"
                 y_attr="Y_CENTER_IN_PARENT"
                 value="1234567890adfjasdlfasdlfj"
                 />
@@ -38,7 +38,7 @@
 
         <list_item visible="1" w="$pw-10" h="50" 
             x_attr="X_CENTER_IN_PARENT"
-            y_attr="Y_FLOAT_TOP" 
+            y_attr="Y_TOP_TO_PREV" 
             bg_image[normal]="list_selector_background_normal.png"
             bg_image[active]="list_selector_background_pressed.png"
             bg_image[focused]="list_selector_background_focus.png"
@@ -50,7 +50,7 @@
                 y_attr="Y_CENTER_IN_PARENT"
                 value="mime_audio.png"/>
             <label visible="1" w="$pw-32-38" h="22"
-                x_attr="X_FLOAT_LEFT"
+                x_attr="X_LEFT_TO_PREV"
                 y_attr="Y_CENTER_IN_PARENT"
                 value="1234567890adfjasdlfasdlfj"
                 />
@@ -66,7 +66,7 @@
 
         <list_item visible="1" w="$pw-10" h="50" 
             x_attr="X_CENTER_IN_PARENT"
-            y_attr="Y_FLOAT_TOP" 
+            y_attr="Y_TOP_TO_PREV" 
             bg_image[normal]="list_selector_background_normal.png"
             bg_image[active]="list_selector_background_pressed.png"
             bg_image[focused]="list_selector_background_focus.png"
@@ -78,7 +78,7 @@
                 y_attr="Y_CENTER_IN_PARENT"
                 value="mime_audio.png"/>
             <label visible="1" w="$pw-32-38" h="22"
-                x_attr="X_FLOAT_LEFT"
+                x_attr="X_LEFT_TO_PREV"
                 y_attr="Y_CENTER_IN_PARENT"
                 value="1234567890adfjasdlfasdlfj"
                 />
@@ -94,7 +94,7 @@
 
         <list_item visible="1" w="$pw-10" h="50" 
             x_attr="X_CENTER_IN_PARENT"
-            y_attr="Y_FLOAT_TOP" 
+            y_attr="Y_TOP_TO_PREV" 
             bg_image[normal]="list_selector_background_normal.png"
             bg_image[active]="list_selector_background_pressed.png"
             bg_image[focused]="list_selector_background_focus.png"
@@ -106,7 +106,7 @@
                 y_attr="Y_CENTER_IN_PARENT"
                 value="mime_audio.png"/>
             <label visible="1" w="$pw-32-38" h="22"
-                x_attr="X_FLOAT_LEFT"
+                x_attr="X_LEFT_TO_PREV"
                 y_attr="Y_CENTER_IN_PARENT"
                 value="1234567890adfjasdlfasdlfj"
                 />
@@ -122,7 +122,7 @@
 
         <list_item visible="1" w="$pw-10" h="50" 
             x_attr="X_CENTER_IN_PARENT"
-            y_attr="Y_FLOAT_TOP" 
+            y_attr="Y_TOP_TO_PREV" 
             bg_image[normal]="list_selector_background_normal.png"
             bg_image[active]="list_selector_background_pressed.png"
             bg_image[focused]="list_selector_background_focus.png"
@@ -134,7 +134,7 @@
                 y_attr="Y_CENTER_IN_PARENT"
                 value="mime_audio.png"/>
             <label visible="1" w="$pw-32-38" h="22"
-                x_attr="X_FLOAT_LEFT"
+                x_attr="X_LEFT_TO_PREV"
                 y_attr="Y_CENTER_IN_PARENT"
                 value="1234567890adfjasdlfasdlfj"
                 />
