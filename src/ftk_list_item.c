@@ -46,19 +46,58 @@
 typedef struct _ListItemPrivInfo
 {
     FtkBitmap* bg_selected;
+    FtkBitmap* bg_normal;
+    FtkBitmap* bg_active;
 
-    int is_selected;
+    int state;
 
 	void* listener_ctx;
 	FtkListener listener;
 }PrivInfo;
 
-Ret ftk_list_item_set_selected(FtkWidget* thiz, int selected)
+#define LIST_ITEM_STATE_NORMAL  0
+#define LIST_ITEM_STATE_ACTIVE  1
+#define LIST_ITEM_STATE_SELECTED 2
+
+int ftk_list_item_is_selected(FtkWidget* thiz)
 {
 	DECL_PRIV0(thiz, priv);
     return_val_if_fail(thiz != NULL, RET_FAIL);
 
-    priv->is_selected = selected; 
+    return (priv->state == LIST_ITEM_STATE_SELECTED) ? 1 : 0;
+}
+
+Ret ftk_list_item_set_selected(FtkWidget* thiz, int selected)
+{
+    int state = LIST_ITEM_STATE_NORMAL;
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL, RET_FAIL);
+
+    state = selected ? LIST_ITEM_STATE_SELECTED : LIST_ITEM_STATE_NORMAL;
+
+    if(priv->state == state)
+    {
+        return RET_OK;
+    }
+
+    priv->state = state;
+
+    ftk_widget_invalidate(thiz);
+
+    return RET_OK;
+}
+
+static Ret ftk_list_item_set_active(FtkWidget* thiz)
+{
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL, RET_FAIL);
+
+    if(priv->state == LIST_ITEM_STATE_ACTIVE)
+    {
+        return RET_OK;
+    }
+
+    priv->state = LIST_ITEM_STATE_ACTIVE;
 
     ftk_widget_invalidate(thiz);
 
@@ -67,7 +106,7 @@ Ret ftk_list_item_set_selected(FtkWidget* thiz, int selected)
 
 static Ret ftk_list_item_on_event(FtkWidget* thiz, FtkEvent* event)
 {
-	Ret ret = RET_FAIL;
+	Ret ret = RET_OK;
 	DECL_PRIV0(thiz, priv);
 
 	switch(event->type)
@@ -80,13 +119,19 @@ static Ret ftk_list_item_on_event(FtkWidget* thiz, FtkEvent* event)
 		}
 		case FTK_EVT_MOUSE_UP:
         {
-            /* ftk_widget_set_active(thiz, 0); */
+            ftk_list_ungrab(ftk_widget_parent(thiz), thiz);
+
+            ret = ftk_list_item_set_selected(thiz, 1);
+
             break;
         }
 		case FTK_EVT_MOUSE_DOWN:
 		{
-            ftk_list_set_selected_item(ftk_widget_parent(thiz), thiz);
-			break;
+            ftk_list_grab(ftk_widget_parent(thiz), thiz);
+
+            ret = ftk_list_item_set_active(thiz);
+
+            break;
 		}
 		case FTK_EVT_RESIZE:
 		case FTK_EVT_MOVE_RESIZE:
@@ -117,6 +162,14 @@ static void ftk_list_item_destroy(FtkWidget* thiz)
         {
             ftk_bitmap_unref(priv->bg_selected);
         }
+        if(priv->bg_normal != NULL)
+        {
+            ftk_bitmap_unref(priv->bg_normal);
+        }
+        if(priv->bg_active != NULL)
+        {
+            ftk_bitmap_unref(priv->bg_active);
+        }
 
 		FTK_ZFREE(priv, sizeof(PrivInfo));
 	}
@@ -130,10 +183,17 @@ static Ret ftk_list_item_on_paint(FtkWidget* thiz)
     return_val_if_fail(thiz != NULL, RET_FAIL);
     FTK_BEGIN_PAINT(x, y, width, height, canvas);
 
-    if(priv->is_selected)
+    if(priv->state == LIST_ITEM_STATE_SELECTED)
     {
-        ftk_logi("paint selected_widget\n");
         ftk_canvas_draw_bg_image(canvas, priv->bg_selected, FTK_BG_FOUR_CORNER, x, y, width, height);
+    }
+    else if(priv->state == LIST_ITEM_STATE_NORMAL)
+    {
+        ftk_canvas_draw_bg_image(canvas, priv->bg_normal, FTK_BG_FOUR_CORNER, x, y, width, height);
+    }
+    else if(priv->state == LIST_ITEM_STATE_ACTIVE)
+    {
+        ftk_canvas_draw_bg_image(canvas, priv->bg_active, FTK_BG_FOUR_CORNER, x, y, width, height);
     }
 
     FTK_END_PAINT();
@@ -145,6 +205,26 @@ Ret ftk_list_item_set_bg_selected(FtkWidget* thiz, FtkBitmap* bitmap)
     return_val_if_fail(thiz != NULL && bitmap != NULL, RET_FAIL);
 
     priv->bg_selected = bitmap;
+
+    return RET_OK;
+}
+
+Ret ftk_list_item_set_bg_normal(FtkWidget* thiz, FtkBitmap* bitmap)
+{
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL && bitmap != NULL, RET_FAIL);
+
+    priv->bg_normal = bitmap;
+
+    return RET_OK;
+}
+
+Ret ftk_list_item_set_bg_active(FtkWidget* thiz, FtkBitmap* bitmap)
+{
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL && bitmap != NULL, RET_FAIL);
+
+    priv->bg_active = bitmap;
 
     return RET_OK;
 }
@@ -162,10 +242,13 @@ FtkWidget* ftk_list_item_create(FtkWidget* parent, int x, int y, int width, int 
 		thiz->on_paint = ftk_list_item_on_paint;
 		thiz->destroy  = ftk_list_item_destroy;
 
-		ftk_widget_init(thiz, FTK_LIST_ITEM, 0, x, y, width, height, FTK_ATTR_BG_FOUR_CORNER);
+		ftk_widget_init(thiz, FTK_LIST_ITEM, 0, x, y, width, height, FTK_ATTR_INSENSITIVE|FTK_ATTR_BG_FOUR_CORNER);
 		ftk_widget_append_child(parent, thiz);
 
         priv->bg_selected = NULL;
+        priv->bg_normal = NULL;
+        priv->bg_active = NULL;
+        priv->state = LIST_ITEM_STATE_NORMAL;
 	}
 	else
 	{

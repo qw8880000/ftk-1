@@ -52,8 +52,7 @@ typedef struct _ListPrivInfo
     int visible_start;
     int total;
 
-    /* int selected; */
-    FtkWidget* selected_widget;
+    FtkWidget* grab_widget;
 	
 	void* listener_ctx;
 	FtkListener listener;
@@ -61,6 +60,79 @@ typedef struct _ListPrivInfo
     void* paint_listener_ctx;
     FtkListPaintListener paint_listener;
 }PrivInfo;
+
+static FtkWidget* ftk_list_get_setlected_item(FtkWidget* thiz);
+static Ret ftk_list_set_selected_item(FtkWidget* thiz, FtkWidget* item);
+
+static FtkWidget* ftk_list_find_target(FtkWidget* thiz, int x, int y)
+{
+	FtkWidget* target = NULL;
+	int left = ftk_widget_left_abs(thiz);
+	int top  = ftk_widget_top_abs(thiz);
+	int w    = ftk_widget_width(thiz);
+	int h    = ftk_widget_height(thiz);
+
+	if(!ftk_widget_is_visible(thiz))
+	{
+		return NULL;
+	}
+
+	if(x < left || y < top || (x > (left + w)) || (y > (top + h)))
+	{
+		return NULL;
+	}
+
+	if(thiz->children != NULL)
+	{
+		FtkWidget* iter = thiz->children;
+		while(iter != NULL)
+		{
+			if((target = ftk_list_find_target(iter, x, y)) != NULL)
+			{
+				return target;
+			}
+
+			iter = ftk_widget_next(iter);
+		}
+	}
+	
+	if (ftk_widget_type(thiz) == FTK_LIST_ITEM)
+	{
+		return thiz;
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
+static Ret ftk_list_on_mouse_event(FtkWidget* thiz, FtkEvent* event)
+{
+	Ret ret = RET_NO_TARGET;
+	FtkWidget* target = NULL;
+	DECL_PRIV0(thiz, priv);
+
+	if(priv->grab_widget != NULL)
+	{
+		return ftk_widget_event(priv->grab_widget, event);
+	}
+
+    /* dispatch event to ftk_list_item */
+	if((target = ftk_list_find_target(thiz, event->u.mouse.x, event->u.mouse.y)) != NULL && target != thiz)
+	{
+
+		if(ftk_widget_type(target) == FTK_LIST_ITEM && ftk_widget_is_visible(target))
+		{
+            ret = ftk_widget_event(target, event);
+        }
+		else
+		{
+			ret = RET_IGNORED;
+		}
+	}
+
+	return ret;
+}
 
 static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
 {
@@ -76,11 +148,26 @@ static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
 			break;
 		}
 		case FTK_EVT_MOUSE_UP:
+        {
+            ftk_window_ungrab(ftk_widget_toplevel(thiz), thiz);
+
+            ret = ftk_list_on_mouse_event(thiz, event);
+            break;
+        }
 		case FTK_EVT_MOUSE_DOWN:
 		{
-			/* ret = ftk_list_view_on_mouse_event(thiz, event); */
+            ftk_window_grab(ftk_widget_toplevel(thiz), thiz);
+
+            ftk_list_item_set_selected(ftk_list_get_setlected_item(thiz), 0);
+
+            ret = ftk_list_on_mouse_event(thiz, event);
 			break;
 		}
+		case FTK_EVT_MOUSE_MOVE:
+        {
+            /* ftk_logi("%s->move\n", __func__); */
+            break;
+        }
 		case FTK_EVT_RESIZE:
 		case FTK_EVT_MOVE_RESIZE:
 		{
@@ -148,8 +235,6 @@ static Ret ftk_list_paint_row(FtkWidget* thiz, int visible_pos, int row, int vis
         }
     }
 
-    ftk_widget_set_insensitive(ftk_list_get_item(thiz, row), !visible);
-
     return RET_OK;
 }
 
@@ -177,17 +262,34 @@ static Ret ftk_list_paint(FtkWidget* thiz, int visible_start, int visible_nr, in
 	return RET_OK;
 }
 
+Ret ftk_list_grab(FtkWidget* thiz, FtkWidget* grab_widget)
+{
+    DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL, RET_FAIL);
+
+    priv->grab_widget = grab_widget;
+
+    return RET_OK;
+}
+
+Ret ftk_list_ungrab(FtkWidget* thiz, FtkWidget* grab_widget)
+{
+    DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL, RET_FAIL);
+
+    priv->grab_widget = NULL;
+
+    return RET_OK;
+}
+
 Ret ftk_list_update(FtkWidget* thiz)
 {
 	DECL_PRIV0(thiz, priv);
 
-    /* 最后一页，选中行要能需要调整 */
+    /* 最后一页，选中行可能需要调整 */
     if(priv->visible_start + priv->rows_nr > priv->total)
     {
-        if(priv->selected_widget != NULL)
-        {
-            ftk_list_set_selected_item(thiz, ftk_list_get_item(thiz, priv->total - priv->visible_start-1));
-        }
+        ftk_list_set_selected_item(thiz, ftk_list_get_item(thiz, priv->total - priv->visible_start-1));
     }
 
     ftk_list_paint(thiz, priv->visible_start, priv->rows_nr, priv->total);
@@ -315,8 +417,7 @@ Ret ftk_list_reset(FtkWidget* thiz)
     DECL_PRIV0(thiz, priv);
 	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
 
-    ftk_list_item_set_selected(priv->selected_widget, 0);
-    priv->selected_widget = NULL;
+    ftk_list_item_set_selected(ftk_list_get_setlected_item(thiz), 0);
     priv->visible_start = 0;
     priv->total = 0;
 
@@ -368,20 +469,44 @@ int ftk_list_get_cur_page_num(FtkWidget* thiz)
     return priv->visible_start / priv->rows_nr;
 }
 
-Ret ftk_list_set_selected_item(FtkWidget* thiz, FtkWidget* item)
+static FtkWidget* ftk_list_get_setlected_item(FtkWidget* thiz)
 {
+    int i = 0;
+	DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL, NULL);
+
+    for(i=0; i<priv->rows_nr; i++)
+    {
+        FtkWidget* item = ftk_list_get_item(thiz, i);
+
+        if(ftk_list_item_is_selected(item))
+        {
+            return item;
+        }
+    }
+
+    return NULL;
+}
+
+static Ret ftk_list_set_selected_item(FtkWidget* thiz, FtkWidget* item)
+{
+    FtkWidget* selected_item = ftk_list_get_setlected_item(thiz);
 	DECL_PRIV0(thiz, priv);
 	return_val_if_fail(thiz != NULL && item != NULL, RET_FAIL);
 
-    if(priv->selected_widget == item)
+    if(selected_item == NULL)
+    {
+        return RET_OK;
+    }
+
+    if(selected_item == item)
     {
         return RET_OK;
     }
     else 
     {
-        ftk_list_item_set_selected(priv->selected_widget, 0);
+        ftk_list_item_set_selected(selected_item, 0);
         ftk_list_item_set_selected(item, 1);
-        priv->selected_widget = item;
     }
 
     return RET_OK;
@@ -401,13 +526,14 @@ FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int heigh
 		thiz->on_paint = ftk_list_on_paint;
 		thiz->destroy  = ftk_list_destroy;
 
-        ftk_widget_init(thiz, FTK_LIST, 0, x, y, width, height, FTK_ATTR_INSENSITIVE|FTK_ATTR_BG_FOUR_CORNER);
+        ftk_widget_init(thiz, FTK_LIST, 0, x, y, width, height, FTK_ATTR_BG_FOUR_CORNER);
         ftk_widget_append_child(parent, thiz);
 
-        priv->selected_widget = NULL;
+        priv->grab_widget = NULL;
         priv->visible_start = 0;
         priv->total = 0;
         priv->rows_nr = 0;
+        priv->cols_nr = 0;
 	}
 	else
 	{

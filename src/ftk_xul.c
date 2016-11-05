@@ -138,6 +138,8 @@ typedef struct _FtkWidgetCreateInfo
     int cols;
     /* list_item */
     FtkBitmap* bg_selected;
+    FtkBitmap* bg_active;
+    FtkBitmap* bg_normal;
 
     int type;
     FtkBitmap* icon;
@@ -574,6 +576,8 @@ static FtkWidget* ftk_xul_list_item_create(FtkWidgetCreateInfo* info)
     widget = ftk_list_item_create(info->parent, info->x, info->y, info->w, info->h);
 
     ftk_list_item_set_bg_selected(widget, info->bg_selected);
+    ftk_list_item_set_bg_normal(widget, info->bg_normal);
+    ftk_list_item_set_bg_active(widget, info->bg_active);
 
     return widget;
 }
@@ -1080,6 +1084,14 @@ static void ftk_xul_builder_init_widget_info(FtkXmlBuilder* thiz, const char** a
                 else if(strcmp(name, "bg_selected") == 0)
                 {
                     info->bg_selected = ftk_xul_load_image(info->priv->callbacks,value);
+                }
+                else if(strcmp(name, "bg_normal") == 0)
+                {
+                    info->bg_normal = ftk_xul_load_image(info->priv->callbacks,value);
+                }
+                else if(strcmp(name, "bg_active") == 0)
+                {
+                    info->bg_active = ftk_xul_load_image(info->priv->callbacks,value);
                 }
 				else
 				{

@@ -3,16 +3,14 @@
 
     <list id="2" value="list" x="0" y="20" w="$ww-10" h="300" 
         x_attr="X_CENTER_IN_PARENT"
-        bg[normal]="ffff0000" visible="1" 
-        bg_image[disable]="list_view_bg.png"
+        visible="1" 
         rows="5"
         cols="3">
 
         <list_item visible="1" y="5" w="$pw-10" h="50" 
             x_attr="X_CENTER_IN_PARENT"
-            bg_image[normal]="list_selector_background_normal.png"
-            bg_image[active]="list_selector_background_pressed.png"
-            bg_image[focused]="list_selector_background_focus.png"
+            bg_normal="list_selector_background_normal.png"
+            bg_active="list_selector_background_pressed.png"
             bg_selected="list_selector_background_focus.png"
             bg[normal]="ff00ff00">
 
@@ -39,9 +37,8 @@
         <list_item visible="1" w="$pw-10" h="50" 
             x_attr="X_CENTER_IN_PARENT"
             y_attr="Y_TOP_TO_PREV" 
-            bg_image[normal]="list_selector_background_normal.png"
-            bg_image[active]="list_selector_background_pressed.png"
-            bg_image[focused]="list_selector_background_focus.png"
+            bg_normal="list_selector_background_normal.png"
+            bg_active="list_selector_background_pressed.png"
             bg_selected="list_selector_background_focus.png"
             bg[normal]="ff0ffff0">
 
@@ -67,9 +64,8 @@
         <list_item visible="1" w="$pw-10" h="50" 
             x_attr="X_CENTER_IN_PARENT"
             y_attr="Y_TOP_TO_PREV" 
-            bg_image[normal]="list_selector_background_normal.png"
-            bg_image[active]="list_selector_background_pressed.png"
-            bg_image[focused]="list_selector_background_focus.png"
+            bg_normal="list_selector_background_normal.png"
+            bg_active="list_selector_background_pressed.png"
             bg_selected="list_selector_background_focus.png"
             bg[normal]="ff0ffff0">
 
@@ -95,9 +91,8 @@
         <list_item visible="1" w="$pw-10" h="50" 
             x_attr="X_CENTER_IN_PARENT"
             y_attr="Y_TOP_TO_PREV" 
-            bg_image[normal]="list_selector_background_normal.png"
-            bg_image[active]="list_selector_background_pressed.png"
-            bg_image[focused]="list_selector_background_focus.png"
+            bg_normal="list_selector_background_normal.png"
+            bg_active="list_selector_background_pressed.png"
             bg_selected="list_selector_background_focus.png"
             bg[normal]="ff0ffff0">
 
@@ -123,9 +118,8 @@
         <list_item visible="1" w="$pw-10" h="50" 
             x_attr="X_CENTER_IN_PARENT"
             y_attr="Y_TOP_TO_PREV" 
-            bg_image[normal]="list_selector_background_normal.png"
-            bg_image[active]="list_selector_background_pressed.png"
-            bg_image[focused]="list_selector_background_focus.png"
+            bg_normal="list_selector_background_normal.png"
+            bg_active="list_selector_background_pressed.png"
             bg_selected="list_selector_background_focus.png"
             bg[normal]="ff0ffff0">
 
