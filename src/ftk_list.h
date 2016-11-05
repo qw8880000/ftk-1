@@ -9,6 +9,8 @@ FTK_BEGIN_DECLS
 typedef Ret (*FtkListPaintListener)(FtkWidget* thiz, void* ctx, int pos, int row, int col, FtkWidget* cell, int visible);
 
 FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int height);
+Ret ftk_list_set_paint_listener(FtkWidget* thiz, FtkListPaintListener listener, void* ctx);
+
 Ret ftk_list_update(FtkWidget* thiz);
 Ret ftk_list_page_prev(FtkWidget* thiz);
 Ret ftk_list_page_next(FtkWidget* thiz);
@@ -17,20 +19,19 @@ Ret ftk_list_remove(FtkWidget* thiz);
 
 int ftk_list_get_total_page_num(FtkWidget* thiz);
 int ftk_list_get_cur_page_num(FtkWidget* thiz);
-FtkListModel* ftk_list_get_model(FtkWidget* thiz);
-int ftk_list_get_rows_nr(FtkWidget* thiz);
-int ftk_list_get_cols_nr(FtkWidget* thiz);
 
-// Ret ftk_list_set_selected_item(FtkWidget* thiz, FtkWidget* item);
+int ftk_list_get_rows_nr(FtkWidget* thiz);
 Ret ftk_list_set_rows_nr(FtkWidget* thiz, int nr);
+int ftk_list_get_cols_nr(FtkWidget* thiz);
 Ret ftk_list_set_cols_nr(FtkWidget* thiz, int nr);
 
 FtkWidget* ftk_list_get_item(FtkWidget* thiz, int row);
 FtkWidget* ftk_list_get_cell(FtkWidget* thiz, int row, int col);
-Ret ftk_list_set_paint_listener(FtkWidget* thiz, FtkListPaintListener listener, void* ctx);
 
 Ret ftk_list_grab(FtkWidget* thiz, FtkWidget* grab_widget);
 Ret ftk_list_ungrab(FtkWidget* thiz, FtkWidget* grab_widget);
+
+int ftk_list_get_setlected_item_index(FtkWidget* thiz);
 
 FTK_END_DECLS
 
