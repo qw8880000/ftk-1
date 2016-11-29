@@ -1213,7 +1213,7 @@ static void ftk_xul_relayout_widget(FtkWidgetCreateInfo* info, FtkWidget* widget
         }
         case X_RIGHT_TO_PREV:
         {
-            x = (pw - prev_x - w) > 0 ? (pw - prev_x - w) : 0;
+            x = (prev_x - w) > 0 ? (prev_x - w) : 0;
             break;
         }
 		default:break;
