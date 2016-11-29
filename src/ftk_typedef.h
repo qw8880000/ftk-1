@@ -152,6 +152,9 @@ typedef enum _FtkWidgetType
 	FTK_TAB,
 	FTK_TAB_PAGE,
 	FTK_KEY_BOARD,
+    FTK_LIST,
+    FTK_LIST_ITEM,
+    FTK_DIV,
 	FTK_WIDGET_TYPE_NR
 }FtkWidgetType;
 
@@ -186,7 +189,9 @@ typedef enum _FtkWidgetAttr
 	FTK_ATTR_QUIT_WHEN_CLOSE = 1<<8, /*for window only*/
 	FTK_ATTR_AUTO_LAYOUT     = 1<<9,  /*for dialog only*/
 	FTK_ATTR_POPUP           = 1<<10,  /*for dialog only*/
-	FTK_ATTR_FULLSCREEN      = 1<<11  /*for window only*/
+	FTK_ATTR_FULLSCREEN      = 1<<11,  /*for window only*/
+    FTK_ATTR_IGNORE_EVENT    = 1<<12,           /* ignore events dispatched by window, but sensitive to events dispatched by it's parent */
+    FTK_ATTR_OVERFLOW_HIDDEN = 1<<13,
 }FtkWidgetAttr;
 
 typedef enum _FtkRotate

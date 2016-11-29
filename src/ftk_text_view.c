@@ -61,6 +61,10 @@ typedef struct _TextViewPrivInfo
 	int lines_offset_nr;
 	unsigned short* lines_offset;
 
+    int mouse_pressed;
+    int last_mouse_pos;
+    int delta;
+
     int noborder;
 }PrivInfo;
 
@@ -297,6 +301,41 @@ static Ret ftk_text_view_handle_mouse_evevnt(FtkWidget* thiz, FtkEvent* event)
 	return ftk_text_view_get_offset_by_pointer(thiz, event->u.mouse.x, event->u.mouse.y);
 }
 
+static Ret ftk_text_view_handle_move_evevnt(FtkWidget* thiz, FtkEvent* event)
+{
+    /* int x = event->u.mouse.x; */
+    int y = event->u.mouse.y;
+
+	DECL_PRIV0(thiz, priv);
+
+    if(!priv->mouse_pressed){
+        return RET_OK;
+    }
+
+    if(abs(y-priv->last_mouse_pos) >= priv->delta)
+    {
+        if(y < priv->last_mouse_pos)            /* up */
+        {
+            priv->visible_start_line++;
+            if((priv->visible_start_line + priv->visible_lines) >= priv->visible_end_line)
+            {
+                int visible_start = priv->visible_end_line - priv->visible_lines;
+                priv->visible_start_line = (visible_start >= 0) ? visible_start : 0;
+            }
+        }
+        else                                    /* down */
+        {
+            priv->visible_start_line = priv->visible_start_line > 0 ? priv->visible_start_line-1 : 0;
+        }
+        
+        priv->last_mouse_pos = y;
+
+        ftk_widget_invalidate(thiz);
+    }
+
+    return RET_OK;
+}
+
 static Ret ftk_text_view_input_str(FtkWidget* thiz, const char* str)
 {
 	int count = 0;
@@ -529,10 +568,40 @@ static Ret ftk_text_view_on_event(FtkWidget* thiz, FtkEvent* event)
 			break;
 		}
 		case FTK_EVT_MOUSE_UP:
-		{
-			ret = ftk_text_view_handle_mouse_evevnt(thiz, event);
+        {
+			if(priv->readonly) 
+            {
+                ftk_window_ungrab(ftk_widget_toplevel(thiz), thiz);
+                priv->mouse_pressed = 0;
+                priv->last_mouse_pos = 0;
+            }
+            else
+            {
+			    ret = ftk_text_view_handle_mouse_evevnt(thiz, event);
+            }
+
 			break;
 		}
+        case FTK_EVT_MOUSE_DOWN:
+        {
+			if(priv->readonly) 
+            {
+                ftk_window_grab(ftk_widget_toplevel(thiz), thiz);
+                priv->mouse_pressed = 1;
+                priv->last_mouse_pos = event->u.mouse.y;
+            }
+
+            break;
+        }
+        case FTK_EVT_MOUSE_MOVE:
+        {
+			if(priv->readonly) 
+            {
+                ftk_text_view_handle_move_evevnt(thiz, event);
+            }
+
+            break;
+        }
 		case FTK_EVT_IM_PREEDIT:
 		{
 			FtkPoint caret_pos = {0};
@@ -586,6 +655,11 @@ static Ret ftk_text_view_on_paint_caret(FtkWidget* thiz)
 	{
 		return RET_OK;
 	}
+
+    if(priv->readonly)
+    {
+		return RET_OK;
+    }
 
 	if(ftk_widget_is_focused(thiz))
 	{
@@ -741,6 +815,7 @@ FtkWidget* ftk_text_view_create(FtkWidget* parent, int x, int y, int width, int 
 		priv->text_buffer = ftk_text_buffer_create(128);
 		ftk_widget_append_child(parent, thiz);
 		ftk_widget_set_wrap_mode(thiz, FTK_WRAP_WORD);
+        priv->delta = ftk_font_desc_get_size(ftk_default_font());
 	}
 	else
 	{

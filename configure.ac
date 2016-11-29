@@ -337,6 +337,10 @@ AC_CONFIG_FILES([ftk.pc
                 apps/gallery/icons/Makefile
                 apps/gallery/lua/Makefile
                 apps/gallery/data/Makefile
+                apps/orange/Makefile
+                apps/orange/data/Makefile
+                apps/orange/icons/Makefile
+                apps/orange/xul/Makefile
                 tools/Makefile
                 tools/cross-build/Makefile
                 tools/fontextract/Makefile

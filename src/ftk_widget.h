@@ -123,6 +123,7 @@ int  ftk_widget_get_font_size(FtkWidget* thiz);
 void ftk_widget_set_font_size(FtkWidget* thiz, int font_size);
 void ftk_widget_set_font(FtkWidget* thiz, const char* font_desc);
 void ftk_widget_reset_gc(FtkWidget* thiz, FtkWidgetState state, FtkGc* gc);
+void ftk_widget_set_gc_fg(FtkWidget* thiz, FtkWidgetState state, FtkColor color);
 void ftk_widget_set_text(FtkWidget* thiz, const char* text);
 void ftk_widget_set_event_listener(FtkWidget* thiz, FtkListener listener, void* ctx);
 void ftk_widget_set_wrap_mode(FtkWidget* thiz, FtkWrapMode mode);

@@ -290,17 +290,40 @@ int ftk_widget_id(FtkWidget* thiz)
 Ret ftk_widget_invalidate(FtkWidget* thiz)
 {
 	FtkRect rect = {0};
+    FtkWidget* iter = ftk_widget_parent(thiz);
+
 	if(!ftk_widget_is_visible(ftk_widget_toplevel(thiz)))
 	{
 		return RET_FAIL;
 	}
-	
-	rect.y = ftk_widget_top_abs(thiz);
-	rect.x = ftk_widget_left_abs(thiz);
-	rect.width = ftk_widget_width(thiz);
-	rect.height = ftk_widget_height(thiz);
 
-	return ftk_window_invalidate(ftk_widget_toplevel(thiz), &rect);
+    for(; iter != NULL; iter = ftk_widget_parent(iter))
+    {
+        if(ftk_widget_has_attr(iter, FTK_ATTR_OVERFLOW_HIDDEN))
+        {
+            break;
+        }
+    }
+
+    if(iter != NULL)                            /* overflow hidden */
+    {
+        rect.y = ftk_widget_top_abs(iter);
+        rect.x = ftk_widget_left_abs(iter);
+        rect.width = ftk_widget_width(iter);
+        rect.height = ftk_widget_height(iter);
+
+        /* return ftk_window_invalidate_forcely(ftk_widget_toplevel(thiz), &rect); */
+        return ftk_window_invalidate(ftk_widget_toplevel(thiz), &rect);
+    }
+    else
+    {
+        rect.y = ftk_widget_top_abs(thiz);
+        rect.x = ftk_widget_left_abs(thiz);
+        rect.width = ftk_widget_width(thiz);
+        rect.height = ftk_widget_height(thiz);
+
+	    return ftk_window_invalidate(ftk_widget_toplevel(thiz), &rect);
+    }
 }
 
 Ret ftk_widget_invalidate_forcely(FtkWidget* thiz)
@@ -1081,6 +1104,14 @@ void    ftk_widget_reset_gc(FtkWidget* thiz, FtkWidgetState state, FtkGc* gc)
 	return;
 }
 
+void ftk_widget_set_gc_fg(FtkWidget* thiz, FtkWidgetState state, FtkColor color)
+{
+    FtkGc* gc = thiz->priv->gc+state;
+	return_if_fail(thiz != NULL && state < FTK_WIDGET_STATE_NR && gc != NULL);
+
+    gc->fg = color;
+}
+
 void ftk_widget_set_text(FtkWidget* thiz, const char* text)
 {
 	FtkEvent event;
@@ -1219,7 +1250,8 @@ FtkWidget* ftk_widget_find_target(FtkWidget* thiz, int x, int y, int only_sensit
 		}
 	}
 	
-	if (only_sensitive && ftk_widget_is_insensitive(thiz))
+	if (only_sensitive && ftk_widget_is_insensitive(thiz) 
+            || ftk_widget_has_attr(thiz, FTK_ATTR_IGNORE_EVENT))
 	{
 		return NULL;
 	}
