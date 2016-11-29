@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<window value="main" x="0" y="0" w="$ww" h="$wh" attr="$FTK_ATTR_IGNORE_CLOSE" bg[normal]="ffffffff" visible="1">
+
+    <button visible="1" id="10" x="0" y="0" w="80" h="40" value="demo_list"/>
+
+</window>

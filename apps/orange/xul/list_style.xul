@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<list_item x="0" y="0" w="300" h="50" visible="0"
+    bg_selected="list_selector_background_focus.png"
+    bg_image[normal]="list_selector_background_normal.png"
+    bg_image[active]="list_selector_background_normal.png"
+    bg_image[focused]="list_selector_background_normal.png" >
+
+    <button visible="1" x_attr="X_LEFT_IN_PARENT" y="5" w="100" h="40" value="demo_list"/>
+    <label visible="1" x_attr="X_LEFT_TO_PREV" y_attr="Y_CENTER_IN_PARENT" w="100" h="22" value="abcd"/>
+
+</list_item>
