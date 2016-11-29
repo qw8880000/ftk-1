@@ -118,3 +118,14 @@ Ret ftk_label_set_alignment(FtkWidget* thiz, FtkAlignment alignment)
 
 	return RET_OK;
 }
+
+Ret ftk_label_set_color(FtkWidget* thiz, FtkColor color)
+{
+	return_val_if_fail(thiz != NULL, RET_FAIL);
+    return_val_if_fail(ftk_widget_type(thiz) == FTK_LABEL, RET_FAIL);
+
+    ftk_widget_set_gc_fg(thiz, FTK_WIDGET_INSENSITIVE, color);
+
+	return RET_OK;
+}
+

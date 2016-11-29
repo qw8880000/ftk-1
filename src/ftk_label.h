@@ -42,6 +42,7 @@ FTK_BEGIN_DECLS
 FtkWidget* ftk_label_create(FtkWidget* parent, int x, int y, int width, int height);
 
 Ret ftk_label_set_alignment(FtkWidget* thiz, FtkAlignment alignment);
+Ret ftk_label_set_color(FtkWidget* thiz, FtkColor color);
 
 FTK_END_DECLS
 
