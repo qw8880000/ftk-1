@@ -77,6 +77,8 @@ extern "C" {
 #include "ftk_clipboard.h"
 #include "ftk_sprite.h"
 #include "ftk_tab.h"
+#include "ftk_tab_title.h"
+#include "ftk_tab_page.h"
 #include "ftk_list.h"
 #include "ftk_list_item.h"
 #include "ftk_div.h"

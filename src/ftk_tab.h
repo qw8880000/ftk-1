@@ -37,21 +37,20 @@
 FTK_BEGIN_DECLS
 
 FtkWidget* ftk_tab_create(FtkWidget* parent, int x, int y, int width, int height);
-FtkWidget* ftk_tab_page_create(FtkWidget* parent, int x, int y, int width, int height);
+Ret ftk_tab_add_title(FtkWidget* thiz, FtkWidget* title);
+Ret ftk_tab_add_page(FtkWidget* thiz, FtkWidget* page);
 
+Ret ftk_tab_set_selected(FtkWidget* thiz, int index);
+
+#if 0
 int     ftk_tab_get_page_count(FtkWidget* thiz);
 FtkWidget* ftk_tab_get_page(FtkWidget* thiz, int index);
 int        ftk_tab_get_page_index(FtkWidget* thiz, FtkWidget* page);
-Ret        ftk_tab_remove_page(FtkWidget* thiz, int index);
-FtkWidget* ftk_tab_add_page(FtkWidget* thiz, const char* text, FtkBitmap* icon);
 
-int ftk_tab_get_active_page(FtkWidget* thiz);
-Ret ftk_tab_set_active_page(FtkWidget* thiz, int index);
-Ret ftk_tab_set_page_text(FtkWidget* thiz, int index, const char* text);
-Ret ftk_tab_set_page_icon(FtkWidget* thiz, int index, FtkBitmap* icon);
-
-const char* ftk_tab_get_page_text(FtkWidget* thiz, int index);
-FtkBitmap* ftk_tab_get_page_icon(FtkWidget* thiz, int index);
+int     ftk_tab_get_title_count(FtkWidget* thiz);
+FtkWidget* ftk_tab_get_title(FtkWidget* thiz, int index);
+int        ftk_tab_get_title_index(FtkWidget* thiz, FtkWidget* title);
+#endif
 
 FTK_END_DECLS
 

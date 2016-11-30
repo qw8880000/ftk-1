@@ -26,14 +26,24 @@ FtkApp* ftk_app_demo_tab_create()
 #define FTK_HIDE extern
 #endif /*FTK_AS_PLUGIN*/
 
-static void add_page(FtkWidget* tab, const char* text, FtkBitmap* bitmap)
+static void add_page(FtkWidget* tab, const char* text, FtkBitmap* bitmap, int index)
 {
 	int width = 0;
 	int height = 0;
 	FtkWidget* page = NULL;
+	FtkWidget* title = NULL;
 	FtkWidget* button = NULL;
+    int tw = ftk_widget_width(tab);
+    int th = ftk_widget_height(tab);
 	
-	page = ftk_tab_add_page(tab, text, bitmap);
+    title = ftk_tab_title_create(tab, tw / 5 * index, 0, tw / 5, 50);
+    ftk_tab_add_title(tab, title); 
+    ftk_widget_set_text(title, text);
+    ftk_tab_title_set_bg_selected(title, bitmap);
+
+    page = ftk_tab_page_create(tab, 0, 50, tw, th - 50);
+	ftk_tab_add_page(tab, page);
+
 	width = ftk_widget_width(page);
 	height = ftk_widget_height(page);
 
@@ -67,12 +77,11 @@ FTK_HIDE int FTK_MAIN(int argc, char* argv[])
 
 	tab = ftk_tab_create(win, 0, 0, width, height - 50);
 
-	add_page(tab, "General", bitmap);
-	add_page(tab, "Graphic", bitmap);
-	add_page(tab, "Audio", bitmap);
+	add_page(tab, "General", bitmap, 0);
+	add_page(tab, "Graphic", bitmap, 1);
+    add_page(tab, "Audio", bitmap, 2);
+    ftk_tab_set_selected(tab, 0);
 
-	ftk_tab_set_active_page(tab, 0);
-	
 	button = ftk_button_create(win, width/4, height - 50, width/2, 50);
 	ftk_widget_set_text(button, _("Quit")); 
 	ftk_widget_show(button, 1);

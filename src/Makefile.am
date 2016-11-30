@@ -67,7 +67,8 @@ libftk_la_SOURCES=\
 	ftk_input_method_preeditor_default.c \
 	ftk_main_loop_select.c ftk_config.c ftk_display_mem.c \
 	ftk_display_rotate.c ftk_wnd_manager.c ftk_path.c \
-	ftk_tab.c ftk_font_desc.c \
+	ftk_tab.c ftk_tab_title.c ftk_tab_page.c \
+	ftk_font_desc.c \
 	ftk_animation_alpha.c   ftk_animation_scale.c      ftk_animation_trigger_default.c \
 	ftk_animation_expand.c  ftk_animation_translate.c  ftk_animation_trigger_silence.c \
 	ftk_animation.c ftk_pairs.c ftk_params.c ftk_interpolator_linear.c \
@@ -292,6 +293,8 @@ ftk_HEADERS=\
 	ftk_status_item.h \
 	ftk_status_panel.h \
 	ftk_tab.h \
+	ftk_tab_title.h \
+	ftk_tab_page.h \
 	ftk_text_buffer.h \
 	ftk_text_layout.h \
 	ftk_text_view.h \

@@ -517,11 +517,28 @@ static FtkWidget* ftk_xul_tab_create(FtkWidgetCreateInfo* info)
     return widget;
 }
 
-static FtkWidget* ftk_xul_page_create(FtkWidgetCreateInfo* info)
+static FtkWidget* ftk_xul_tab_title_create(FtkWidgetCreateInfo* info)
+{
+	FtkWidget* widget = NULL;
+
+	widget = ftk_tab_title_create(info->parent, info->x, info->y, info->w, info->h);
+    ftk_tab_add_title(info->parent, widget);
+
+	if(info->value != NULL)
+	{
+		ftk_widget_set_text(widget, ftk_xul_translate_text(info->priv->callbacks, info->value));
+	}
+
+	return widget;
+}
+
+
+static FtkWidget* ftk_xul_tab_page_create(FtkWidgetCreateInfo* info)
 {
     FtkWidget* widget = NULL;
 
-    widget = ftk_tab_add_page(info->parent, info->value, info->icon);
+	widget = ftk_tab_page_create(info->parent, info->x, info->y, info->w, info->h);
+    ftk_tab_add_page(info->parent, widget);
 
     return widget;
 }
@@ -618,7 +635,8 @@ static const WidgetCreator s_widget_creaters[] =
     {"painter",            ftk_xul_painter_create,             1},
     {"status_item",        ftk_xul_status_item_create,         1},
     {"tab",                ftk_xul_tab_create,                 1},
-    {"page",               ftk_xul_page_create,                1},
+    {"ttitle",             ftk_xul_tab_title_create,           1},
+    {"tpage",              ftk_xul_tab_page_create,            1},
     {"text_view",          ftk_xul_text_view_create,           1},
     {"list",               ftk_xul_list_create,                1},
     {"list_item",          ftk_xul_list_item_create,           1},
