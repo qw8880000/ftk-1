@@ -144,6 +144,12 @@ static void ftk_tab_title_destroy(FtkWidget* thiz)
 	if(thiz != NULL)
 	{
 		DECL_PRIV0(thiz, priv);
+
+        if(priv->bg_selected != NULL)
+        {
+            ftk_bitmap_unref(priv->bg_selected);
+        }
+
 		FTK_ZFREE(priv, sizeof(PrivInfo));
 	}
 
@@ -194,13 +200,19 @@ Ret ftk_tab_title_set_selected(FtkWidget* thiz, int selected)
 	return RET_OK;
 }
 
-Ret ftk_tab_title_set_bg_selected(FtkWidget* thiz, FtkBitmap* bg_selected)
+Ret ftk_tab_title_set_bg_selected(FtkWidget* thiz, FtkBitmap* bitmap)
 {
 	DECL_PRIV0(thiz, priv);
 	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
-	return_val_if_fail(bg_selected != NULL, RET_FAIL);
+	return_val_if_fail(bitmap != NULL, RET_FAIL);
 
-    priv->bg_selected = bg_selected;
+    if(priv->bg_selected != NULL)
+    {
+        ftk_bitmap_unref(priv->bg_selected);
+    }
+
+    priv->bg_selected = bitmap;
 
 	return RET_OK;
 }
+

@@ -142,6 +142,11 @@ Ret ftk_list_item_set_bg_selected(FtkWidget* thiz, FtkBitmap* bitmap)
 	DECL_PRIV0(thiz, priv);
     return_val_if_fail(thiz != NULL && bitmap != NULL, RET_FAIL);
 
+    if(priv->bg_selected != NULL)
+    {
+        ftk_bitmap_unref(priv->bg_selected);
+    }
+
     priv->bg_selected = bitmap;
 
     return RET_OK;
