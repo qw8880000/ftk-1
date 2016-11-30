@@ -1112,6 +1112,19 @@ void ftk_widget_set_gc_fg(FtkWidget* thiz, FtkWidgetState state, FtkColor color)
     gc->fg = color;
 }
 
+void ftk_widget_set_gc_bg_image(FtkWidget* thiz, FtkWidgetState state, FtkBitmap* bitmap)
+{
+	FtkGc gc;
+    memset(&gc, 0, sizeof(FtkGc));
+
+    return_if_fail(thiz != NULL && bitmap != NULL);
+
+    gc.mask |= FTK_GC_BITMAP;
+    gc.bitmap = bitmap;
+
+    ftk_widget_set_gc(thiz, state, &gc);
+}
+
 void ftk_widget_set_text(FtkWidget* thiz, const char* text)
 {
 	FtkEvent event;

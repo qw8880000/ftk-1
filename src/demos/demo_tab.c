@@ -26,7 +26,7 @@ FtkApp* ftk_app_demo_tab_create()
 #define FTK_HIDE extern
 #endif /*FTK_AS_PLUGIN*/
 
-static void add_page(FtkWidget* tab, const char* text, FtkBitmap* bitmap, int index)
+static void add_page(FtkWidget* tab, const char* text, FtkBitmap* normal_bitmap, FtkBitmap* selected_bitmap, int index)
 {
 	int width = 0;
 	int height = 0;
@@ -39,7 +39,8 @@ static void add_page(FtkWidget* tab, const char* text, FtkBitmap* bitmap, int in
     title = ftk_tab_title_create(tab, tw / 5 * index, 0, tw / 5, 50);
     ftk_tab_add_title(tab, title); 
     ftk_widget_set_text(title, text);
-    ftk_tab_title_set_bg_selected(title, bitmap);
+    ftk_tab_title_set_bg_selected(title, selected_bitmap);
+    ftk_widget_set_gc_bg_image(title, FTK_WIDGET_NORMAL, normal_bitmap);
 
     page = ftk_tab_page_create(tab, 0, 50, tw, th - 50);
 	ftk_tab_add_page(tab, page);
@@ -67,19 +68,21 @@ FTK_HIDE int FTK_MAIN(int argc, char* argv[])
 	FtkWidget* win = NULL;
 	FtkWidget* tab = NULL;
 	FtkWidget* button = NULL;
-	FtkBitmap* bitmap = NULL;
+	FtkBitmap* selected_bitmap = NULL;
+	FtkBitmap* normal_bitmap = NULL;
 	FTK_INIT(argc, argv);
 	
-	bitmap = ftk_theme_load_image(ftk_default_theme(), "mime_audio"FTK_STOCK_IMG_SUFFIX);
+	selected_bitmap = ftk_theme_load_image(ftk_default_theme(), "tab-pressed"FTK_STOCK_IMG_SUFFIX);
+	normal_bitmap = ftk_theme_load_image(ftk_default_theme(), "tab-normal"FTK_STOCK_IMG_SUFFIX);
 	win = ftk_app_window_create();
 	width = ftk_widget_width(win);
 	height = ftk_widget_height(win);
 
 	tab = ftk_tab_create(win, 0, 0, width, height - 50);
 
-	add_page(tab, "General", bitmap, 0);
-	add_page(tab, "Graphic", bitmap, 1);
-    add_page(tab, "Audio", bitmap, 2);
+	add_page(tab, "General", normal_bitmap, selected_bitmap, 0);
+	add_page(tab, "Graphic", normal_bitmap, selected_bitmap, 1);
+    add_page(tab, "Audio", normal_bitmap, selected_bitmap, 2);
     ftk_tab_set_selected(tab, 0);
 
 	button = ftk_button_create(win, width/4, height - 50, width/2, 50);
@@ -90,7 +93,8 @@ FTK_HIDE int FTK_MAIN(int argc, char* argv[])
 
 	ftk_widget_show_all(win, 1);
 	FTK_QUIT_WHEN_WIDGET_CLOSE(win);
-	FTK_BITMAP_UNREF(bitmap);
+	FTK_BITMAP_UNREF(selected_bitmap);
+	FTK_BITMAP_UNREF(normal_bitmap);
 
 	FTK_RUN();
 
