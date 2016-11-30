@@ -528,6 +528,10 @@ static FtkWidget* ftk_xul_tab_title_create(FtkWidgetCreateInfo* info)
 	{
 		ftk_widget_set_text(widget, ftk_xul_translate_text(info->priv->callbacks, info->value));
 	}
+    if(info->bg_selected != NULL)
+    {
+        ftk_tab_title_set_bg_selected(widget, info->bg_selected);
+    }
 
 	return widget;
 }

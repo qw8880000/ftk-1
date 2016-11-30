@@ -38,11 +38,12 @@
  *
  */
 /* ----------------------------------------------------------------------------*/
-#include "ftk_tab_title.h"
 #include "ftk_window.h"
 #include "ftk_canvas.h"
 #include "ftk_theme.h"
 #include "ftk_globals.h"
+#include "ftk_tab.h"
+#include "ftk_tab_title.h"
 
 typedef struct _TabTitlePrivInfo
 {
@@ -77,6 +78,7 @@ static Ret ftk_tab_title_on_event(FtkWidget* thiz, FtkEvent* event)
 				ftk_widget_set_active(thiz, 0);
 				if(FTK_POINT_IN_WIDGET(x, y, thiz))
 				{
+                    ftk_tab_click_title(ftk_widget_parent(thiz), thiz);
 					ret = FTK_CALL_LISTENER(priv->listener, priv->listener_ctx, thiz);
 				}
 			}

@@ -111,10 +111,8 @@ static int ftk_tab_get_title_index(FtkWidget* thiz, FtkWidget* title)
     return -1;
 }
 
-static Ret ftk_tab_title_clicked(void* ctx, void* obj)
+Ret ftk_tab_click_title(FtkWidget* thiz, FtkWidget* title)
 {
-    FtkWidget* thiz = (FtkWidget*)ctx;
-    FtkWidget* title = (FtkWidget*)obj;
 	DECL_PRIV0(thiz, priv);
     return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
     return_val_if_fail(title != NULL, RET_FAIL);
@@ -136,8 +134,6 @@ Ret ftk_tab_add_title(FtkWidget* thiz, FtkWidget* title)
 
     priv->title_array[priv->title_nr] = title;
     priv->title_nr++;
-
-	ftk_tab_title_set_clicked_listener(title, ftk_tab_title_clicked, thiz);
 
     return RET_OK;
 }

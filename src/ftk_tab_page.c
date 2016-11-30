@@ -85,7 +85,7 @@ FtkWidget* ftk_tab_page_create(FtkWidget* parent, int x, int y, int width, int h
 		thiz->on_paint = ftk_tab_page_on_paint;
 		thiz->destroy  = ftk_tab_page_destroy;
 
-		ftk_widget_init(thiz, FTK_TAB_PAGE, 0, x, y, width, height, FTK_ATTR_INSENSITIVE|FTK_ATTR_BG_FOUR_CORNER);
+		ftk_widget_init(thiz, FTK_TAB_PAGE, 0, x, y, width, height, FTK_ATTR_INSENSITIVE|FTK_ATTR_TRANSPARENT);
 		ftk_widget_append_child(parent, thiz);
 	}
 	else

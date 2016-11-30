@@ -40,6 +40,7 @@ FtkWidget* ftk_tab_create(FtkWidget* parent, int x, int y, int width, int height
 Ret ftk_tab_add_title(FtkWidget* thiz, FtkWidget* title);
 Ret ftk_tab_add_page(FtkWidget* thiz, FtkWidget* page);
 
+Ret ftk_tab_click_title(FtkWidget* thiz, FtkWidget* title);
 Ret ftk_tab_set_selected(FtkWidget* thiz, int index);
 
 #if 0
