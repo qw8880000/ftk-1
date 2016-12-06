@@ -93,7 +93,7 @@ FtkWidget* ftk_tab_create(FtkWidget* parent, int x, int y, int width, int height
 	return thiz;
 }
 
-static int ftk_tab_get_title_index(FtkWidget* thiz, FtkWidget* title)
+int ftk_tab_get_title_index(FtkWidget* thiz, FtkWidget* title)
 {
     int i = 0;
 	DECL_PRIV0(thiz, priv);
@@ -186,4 +186,22 @@ Ret ftk_tab_set_selected(FtkWidget* thiz, int index)
 
     return RET_OK;
 }
+
+int ftk_tab_get_selected_title_index(FtkWidget* thiz)
+{
+    int i = 0;
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL && priv != NULL, -1);
+
+    for(i = 0; i < priv->title_nr; i++)
+    {
+        if(ftk_tab_title_is_selected(priv->title_array[i]))
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
 

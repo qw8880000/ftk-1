@@ -218,3 +218,11 @@ Ret ftk_tab_title_set_bg_selected(FtkWidget* thiz, FtkBitmap* bitmap)
 	return RET_OK;
 }
 
+int ftk_tab_title_is_selected(FtkWidget* thiz)
+{
+	DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+
+    return priv->selected;
+}
+

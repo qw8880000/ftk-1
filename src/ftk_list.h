@@ -37,6 +37,8 @@ int ftk_list_get_cur_page_num(FtkWidget* thiz);
 Ret ftk_list_grab(FtkWidget* thiz, FtkWidget* grab_widget);
 Ret ftk_list_ungrab(FtkWidget* thiz, FtkWidget* grab_widget);
 
+Ret ftk_list_set_clicked_listener(FtkWidget* thiz, FtkListener listener, void* ctx);
+int ftk_list_get_selected_position(FtkWidget* thiz);
 
 FTK_END_DECLS
 

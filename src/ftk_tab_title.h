@@ -9,6 +9,7 @@ FtkWidget* ftk_tab_title_create(FtkWidget* parent, int x, int y, int width, int 
 Ret ftk_tab_title_set_clicked_listener(FtkWidget* thiz, FtkListener listener, void* ctx);
 Ret ftk_tab_title_set_selected(FtkWidget* thiz, int selected);
 Ret ftk_tab_title_set_bg_selected(FtkWidget* thiz, FtkBitmap* bitmap);
+int ftk_tab_title_is_selected(FtkWidget* thiz);
 
 FTK_END_DECLS
 

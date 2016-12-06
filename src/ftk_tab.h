@@ -43,6 +43,8 @@ Ret ftk_tab_add_page(FtkWidget* thiz, FtkWidget* page);
 Ret ftk_tab_click_title(FtkWidget* thiz, FtkWidget* title);
 Ret ftk_tab_set_selected(FtkWidget* thiz, int index);
 
+int ftk_tab_get_title_index(FtkWidget* thiz, FtkWidget* title);
+int ftk_tab_get_selected_title_index(FtkWidget* thiz);
 #if 0
 int     ftk_tab_get_page_count(FtkWidget* thiz);
 FtkWidget* ftk_tab_get_page(FtkWidget* thiz, int index);
@@ -50,7 +52,6 @@ int        ftk_tab_get_page_index(FtkWidget* thiz, FtkWidget* page);
 
 int     ftk_tab_get_title_count(FtkWidget* thiz);
 FtkWidget* ftk_tab_get_title(FtkWidget* thiz, int index);
-int        ftk_tab_get_title_index(FtkWidget* thiz, FtkWidget* title);
 #endif
 
 FTK_END_DECLS

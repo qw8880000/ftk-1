@@ -80,6 +80,7 @@ typedef struct _ListPrivInfo
 
     int visible_nr;
 
+    char* item_style;
     int move_support;
 
     int selected;
@@ -579,12 +580,20 @@ static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
 		}
 		case FTK_EVT_MOUSE_UP:
         {
+			int x = event->u.mouse.x;
+			int y = event->u.mouse.y;
+
             ftk_window_ungrab(ftk_widget_toplevel(thiz), thiz);
 
             priv->mouse_pressed = 0;
             priv->last_mouse_pos = 0;
             
             ftk_list_dispatch_mouse_event(thiz, event);
+
+            if(FTK_POINT_IN_WIDGET(x, y, thiz))
+            {
+                ret = FTK_CALL_LISTENER(priv->listener, priv->listener_ctx, thiz);
+            }
 
             break;
         }
@@ -637,6 +646,11 @@ static void ftk_list_destroy(FtkWidget* thiz)
         if(priv->item_array != NULL)
         {
             FTK_FREE(priv->item_array);
+        }
+
+        if(priv->item_style != NULL)
+        {
+            FTK_FREE(priv->item_style);
         }
 
 		FTK_ZFREE(priv, sizeof(PrivInfo));
@@ -845,11 +859,9 @@ int ftk_list_get_cur_page_num(FtkWidget* thiz)
 Ret ftk_list_grab(FtkWidget* thiz, FtkWidget* grab_widget)
 {
     DECL_PRIV0(thiz, priv);
-    return_val_if_fail(thiz != NULL, RET_FAIL);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
 
     priv->grab_widget = grab_widget;
-
-    
 
     return RET_OK;
 }
@@ -857,11 +869,29 @@ Ret ftk_list_grab(FtkWidget* thiz, FtkWidget* grab_widget)
 Ret ftk_list_ungrab(FtkWidget* thiz, FtkWidget* grab_widget)
 {
     DECL_PRIV0(thiz, priv);
-    return_val_if_fail(thiz != NULL, RET_FAIL);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
 
     priv->grab_widget = NULL;
 
     return RET_OK;
 }
 
+Ret ftk_list_set_clicked_listener(FtkWidget* thiz, FtkListener listener, void* ctx)
+{
+	DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+
+	priv->listener_ctx = ctx;
+	priv->listener = listener;
+
+	return RET_OK;
+}
+
+int ftk_list_get_selected_position(FtkWidget* thiz)
+{
+	DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL && priv != NULL, -1);
+
+	return priv->selected;
+}
 
