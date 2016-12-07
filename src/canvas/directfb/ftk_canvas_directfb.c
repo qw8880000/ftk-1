@@ -188,7 +188,7 @@ static Ret ftk_canvas_directfb_draw_string(FtkCanvas* thiz, int x, int y,
 	return RET_OK;
 }
 
-static Ret fk_canvas_directfb_lock_buffer(FtkCanvas* thiz, FtkBitmap** bitmap)
+static Ret ftk_canvas_directfb_lock_buffer(FtkCanvas* thiz, FtkBitmap** bitmap)
 {
 	DECL_PRIV(thiz, priv);
 
@@ -239,20 +239,22 @@ static void ftk_canvas_directfb_destroy(FtkCanvas* thiz)
 
 static const FtkCanvasVTable g_canvas_directfb_vtable=
 {
-	ftk_canvas_directfb_sync_gc,
-	ftk_canvas_directfb_set_clip,
-	ftk_canvas_directfb_draw_pixels,
-	ftk_canvas_directfb_draw_line,
-	ftk_canvas_directfb_clear_rect,
-	ftk_canvas_directfb_draw_rect,
+    .sync_gc          = ftk_canvas_directfb_sync_gc,
+	.set_clip         = ftk_canvas_directfb_set_clip,
+	.set_clip_special = NULL,
+	.draw_pixels      = ftk_canvas_directfb_draw_pixels,
+	.draw_line        = ftk_canvas_directfb_draw_line,
+	.clear_rect       = ftk_canvas_directfb_clear_rect,
+	.draw_rect        = ftk_canvas_directfb_draw_rect,
 
-	ftk_canvas_directfb_draw_bitmap,
-	ftk_canvas_directfb_draw_string,
-	ftk_canvas_directfb_get_str_extent,
-	ftk_canvas_directfb_get_char_extent,
-	fk_canvas_directfb_lock_buffer,
-	ftk_canvas_directfb_unlock_buffer,
-	ftk_canvas_directfb_destroy
+	.draw_bitmap      = ftk_canvas_directfb_draw_bitmap,
+	.draw_string      = ftk_canvas_directfb_draw_string,
+	.get_str_extent   = ftk_canvas_directfb_get_str_extent,
+	.get_char_extent  = ftk_canvas_directfb_get_char_extent,
+	.lock_buffer      = ftk_canvas_directfb_lock_buffer,
+	.unlock_buffer    = ftk_canvas_directfb_unlock_buffer,
+	.destroy          = ftk_canvas_directfb_destroy
+
 };
 
 FtkCanvas* ftk_canvas_create(int w, int h, FtkColor* clear_color)

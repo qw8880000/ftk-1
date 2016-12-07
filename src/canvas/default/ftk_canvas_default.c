@@ -60,6 +60,10 @@ typedef struct _CanvasDefaultPrivInfo
 	FtkFont* font;
 	FtkFontManager* font_manager;
 	FtkRegion  clip_regions[FTK_MAX_CLIP_REGION_NR];
+
+    int clip_special;
+	FtkRegion  clip_special_regions[FTK_MAX_CLIP_REGION_NR];
+
 }PrivInfo;
 
 static int s_font_manager_ref = 0;
@@ -92,7 +96,9 @@ static void font_manager_unref()
 }
 
 #define FOR_EACH_CLIP(priv) \
-	for(priv->clip = priv->clip_regions; priv->clip != NULL; priv->clip = priv->clip->next)
+    if(priv->clip_special == 1){priv->clip = priv->clip_special_regions;} \
+    else{priv->clip = priv->clip_regions;} \
+	for(; priv->clip != NULL; priv->clip = priv->clip->next)
 
 #define FTK_POINT_IN_RECT(xx, yy, r) ((xx >= r.x && xx < (r.x + r.width)) \
 	&& (yy >= r.y && yy < (r.y + r.height)))
@@ -142,6 +148,49 @@ static Ret ftk_canvas_default_sync_gc(FtkCanvas* thiz)
 	return RET_OK;
 }
 
+static Ret ftk_canvas_default_set_clip_special(FtkCanvas* thiz, FtkRegion* clip)
+{
+    int i = 0;
+	DECL_PRIV(thiz, priv);
+	FtkRegion* iter = NULL;
+
+    return_val_if_fail(thiz != NULL, RET_FAIL);
+
+    if(clip != NULL)
+    {
+        priv->clip_special = 1;
+
+        for(i = 0, iter = clip; i < FTK_MAX_CLIP_REGION_NR && iter != NULL; i++, iter = iter->next)
+        {
+            FtkRect* r = &(priv->clip_special_regions[i].rect);
+            priv->clip_special_regions[i] = *iter;
+
+            r->x = r->x < 0 ? 0 : r->x;
+            r->y = r->y < 0 ? 0 : r->y;
+            r->width = r->width < priv->w ? r->width : priv->w;
+            r->height = r->height < priv->h ? r->height : priv->h;
+
+            priv->clip_special_regions[i].next = NULL;
+            if(i > 0)
+            {
+                priv->clip_special_regions[i - 1].next = priv->clip_special_regions+i;
+            }
+        }
+    }
+    else
+    {
+        priv->clip_special = 0;
+
+		priv->clip_special_regions[0].rect.x = 0;
+		priv->clip_special_regions[0].rect.y = 0;
+		priv->clip_special_regions[0].rect.width = priv->w;
+		priv->clip_special_regions[0].rect.height = priv->h;
+		priv->clip_special_regions[0].next = NULL;
+    }
+
+	return RET_OK;
+}
+
 static Ret ftk_canvas_default_set_clip(FtkCanvas* thiz, FtkRegion* clip)
 {
 	int i = 0;
@@ -185,6 +234,7 @@ static Ret ftk_canvas_default_set_clip(FtkCanvas* thiz, FtkRegion* clip)
 #endif
 	return RET_OK;
 }
+
 
 static Ret ftk_canvas_default_draw_pixels(FtkCanvas* thiz, FtkPoint* points, int nr)
 {
@@ -1010,20 +1060,22 @@ static int ftk_canvas_default_get_str_extent(FtkCanvas* thiz, const char* str, i
 
 static const FtkCanvasVTable g_canvas_default_vtable=
 {
-	ftk_canvas_default_sync_gc,
-	ftk_canvas_default_set_clip,
-	ftk_canvas_default_draw_pixels_clip,
-	ftk_canvas_default_draw_line_clip,
-	ftk_canvas_default_clear_rect_clip,
-	ftk_canvas_default_draw_rect_clip,
 
-	ftk_canvas_default_draw_bitmap_clip,
-	ftk_canvas_default_draw_string_clip,
-	ftk_canvas_default_get_str_extent,
-	ftk_canvas_default_get_char_extent,
-	ftk_canvas_default_lock_buffer,
-	ftk_canvas_default_unlock_buffer,
-	ftk_canvas_default_destroy
+	.sync_gc          = ftk_canvas_default_sync_gc,
+	.set_clip         = ftk_canvas_default_set_clip,
+	.set_clip_special = ftk_canvas_default_set_clip_special,
+	.draw_pixels      = ftk_canvas_default_draw_pixels_clip,
+	.draw_line        = ftk_canvas_default_draw_line_clip,
+	.clear_rect       = ftk_canvas_default_clear_rect_clip,
+	.draw_rect        = ftk_canvas_default_draw_rect_clip,
+
+	.draw_bitmap      = ftk_canvas_default_draw_bitmap_clip,
+	.draw_string      = ftk_canvas_default_draw_string_clip,
+	.get_str_extent   = ftk_canvas_default_get_str_extent,
+	.get_char_extent  = ftk_canvas_default_get_char_extent,
+	.lock_buffer      = ftk_canvas_default_lock_buffer,
+	.unlock_buffer    = ftk_canvas_default_unlock_buffer,
+	.destroy          = ftk_canvas_default_destroy
 };
 
 FtkCanvas* ftk_canvas_create(int w, int h, FtkColor* clear_color)

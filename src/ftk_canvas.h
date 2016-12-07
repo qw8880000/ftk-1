@@ -54,6 +54,7 @@ typedef struct _FtkCanvasVTable FtkCanvasVTable;
 
 typedef Ret (*FtkCanvasSyncGc)(FtkCanvas* thiz);
 typedef Ret (*FtkCanvasSetClip)(FtkCanvas* thiz, FtkRegion* clip);
+typedef Ret (*FtkCanvasSetClipSpecial)(FtkCanvas* thiz, FtkRegion* clip);
 
 typedef Ret (*FtkCanvasDrawPixels)(FtkCanvas* thiz, FtkPoint* points, int nr);
 typedef Ret (*FtkCanvasDrawLine)(FtkCanvas* thiz, int x1, int y1, int x2, int y2);
@@ -71,19 +72,20 @@ typedef void (*FtkCanvasDestroy)(FtkCanvas* thiz);
 
 struct _FtkCanvasVTable
 {
-	FtkCanvasSyncGc        sync_gc;
-	FtkCanvasSetClip       set_clip;
-	FtkCanvasDrawPixels    draw_pixels;
-	FtkCanvasDrawLine      draw_line;
-	FtkCanvasClearRect     clear_rect;
-	FtkCanvasDrawRect      draw_rect;
-	FtkCanvasDrawBitmap    draw_bitmap;
-	FtkCanvasDrawString    draw_string;
-	FtkCanvasGetStrExtent  get_str_extent;
-	FtkCanvasGetCharExtent get_char_extent;
-	FtkCanvasLockBuffer    lock_buffer;
-	FtkCanvasUnlockBuffer  unlock_buffer;
-	FtkCanvasDestroy       destroy;
+	FtkCanvasSyncGc         sync_gc;
+	FtkCanvasSetClip        set_clip;
+	FtkCanvasSetClipSpecial set_clip_special;
+	FtkCanvasDrawPixels     draw_pixels;
+	FtkCanvasDrawLine       draw_line;
+	FtkCanvasClearRect      clear_rect;
+	FtkCanvasDrawRect       draw_rect;
+	FtkCanvasDrawBitmap     draw_bitmap;
+	FtkCanvasDrawString     draw_string;
+	FtkCanvasGetStrExtent   get_str_extent;
+	FtkCanvasGetCharExtent  get_char_extent;
+	FtkCanvasLockBuffer     lock_buffer;
+	FtkCanvasUnlockBuffer   unlock_buffer;
+	FtkCanvasDestroy        destroy;
 };
 
 struct _FtkCanvas
@@ -115,6 +117,18 @@ static inline Ret ftk_canvas_set_clip(FtkCanvas* thiz, FtkRegion* clip)
 	if(thiz != NULL && thiz->vtable != NULL && thiz->vtable->set_clip != NULL)
 	{
 		ret = thiz->vtable->set_clip(thiz, clip);
+	}
+
+	return ret;
+}
+
+static inline Ret ftk_canvas_set_clip_special(FtkCanvas* thiz, FtkRegion* clip)
+{
+	Ret ret = RET_FAIL;
+	
+	if(thiz != NULL && thiz->vtable != NULL && thiz->vtable->set_clip != NULL)
+	{
+		ret = thiz->vtable->set_clip_special(thiz, clip);
 	}
 
 	return ret;
@@ -218,6 +232,7 @@ FtkGc* ftk_canvas_get_gc(FtkCanvas* thiz);
 Ret    ftk_canvas_reset_gc(FtkCanvas* thiz, FtkGc* gc);
 Ret    ftk_canvas_set_gc(FtkCanvas* thiz, FtkGc* gc);
 Ret    ftk_canvas_set_clip_rect(FtkCanvas* thiz, FtkRect* rect);
+Ret    ftk_canvas_set_clip_special_rect(FtkCanvas* thiz, FtkRect* rect);
 Ret    ftk_canvas_set_clip_region(FtkCanvas* thiz, FtkRegion* region);
 Ret    ftk_canvas_draw_vline(FtkCanvas* thiz, int x, int y, int h);
 Ret    ftk_canvas_draw_hline(FtkCanvas* thiz, int x, int y, int w);

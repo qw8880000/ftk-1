@@ -77,6 +77,22 @@ Ret    ftk_canvas_set_clip_rect(FtkCanvas* thiz, FtkRect* rect)
 	}
 }
 
+Ret    ftk_canvas_set_clip_special_rect(FtkCanvas* thiz, FtkRect* rect)
+{
+	if(rect != NULL)
+	{
+		FtkRegion region;
+		region.rect = *rect;
+		region.next = NULL;
+
+		return ftk_canvas_set_clip_special(thiz, &region);
+	}
+	else
+	{
+		return ftk_canvas_set_clip_special(thiz, NULL);
+	}
+}
+
 Ret    ftk_canvas_set_clip_region(FtkCanvas* thiz, FtkRegion* region)
 {
 	return ftk_canvas_set_clip(thiz, region);

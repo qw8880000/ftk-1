@@ -260,20 +260,22 @@ static int ftk_canvas_skia_get_str_extent(FtkCanvas* thiz, const char* str, int 
 
 static const FtkCanvasVTable g_canvas_skia_vtable=
 {
-	ftk_canvas_skia_sync_gc,
-	ftk_canvas_skia_set_clip,
-	ftk_canvas_skia_draw_pixels,
-	ftk_canvas_skia_draw_line,
-	ftk_canvas_skia_clear_rect,
-	ftk_canvas_skia_draw_rect,
+    .sync_gc          = ftk_canvas_skia_sync_gc,
+	.set_clip         = ftk_canvas_skia_set_clip,
+	.set_clip_special = NULL,
+	.draw_pixels      = ftk_canvas_skia_draw_pixels,
+	.draw_line        = ftk_canvas_skia_draw_line,
+	.clear_rect       = ftk_canvas_skia_clear_rect,
+	.draw_rect        = ftk_canvas_skia_draw_rect,
 
-	ftk_canvas_skia_draw_bitmap,
-	ftk_canvas_skia_draw_string,
-	ftk_canvas_skia_get_str_extent,
-	ftk_canvas_skia_get_char_extent,
-	fk_canvas_skia_lock_buffer,
-	ftk_canvas_skia_unlock_buffer,
-	ftk_canvas_skia_destroy
+	.draw_bitmap      = ftk_canvas_skia_draw_bitmap,
+	.draw_string      = ftk_canvas_skia_draw_string,
+	.get_str_extent   = ftk_canvas_skia_get_str_extent,
+	.get_char_extent  = ftk_canvas_skia_get_char_extent,
+	.lock_buffer      = ftk_canvas_skia_lock_buffer,
+	.unlock_buffer    = ftk_canvas_skia_unlock_buffer,
+	.destroy          = ftk_canvas_skia_destroy
+
 };
 
 static void destroy_bitmap(void* data)
