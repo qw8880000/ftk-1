@@ -135,6 +135,7 @@ static Ret ftk_list_set_item_active(FtkWidget* thiz, int index)
     int position = priv->position + (index - priv->index);
     return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
     return_val_if_fail(item != NULL, RET_FAIL);
+    return_val_if_fail(item->widget != NULL, RET_FAIL);
 
     if(item->active == 0)       /* scrap change to active */
     {
@@ -160,6 +161,7 @@ static Ret ftk_list_set_item_scrap(FtkWidget* thiz, int index)
 {
     ListItemInfo* item = ftk_list_get_item(thiz, index);
     return_val_if_fail(item != NULL, RET_FAIL);
+    return_val_if_fail(item->widget != NULL, RET_FAIL);
 
     item->active = 0;
     ftk_widget_set_visible(item->widget, 0);
@@ -172,6 +174,7 @@ static Ret ftk_list_set_item_position(FtkWidget* thiz, int index, int y)
 {
     ListItemInfo* item = ftk_list_get_item(thiz, index);
     return_val_if_fail(item != NULL, RET_FAIL);
+    return_val_if_fail(item->widget != NULL, RET_FAIL);
 
     /* ftk_widget_move(item->widget, ftk_widget_left(item->widget), y); */
     ftk_widget_set_top(item->widget, y);
@@ -289,8 +292,11 @@ Ret ftk_list_init(FtkWidget* thiz, FtkListCallBacks* callbacks)
     priv->y_offset = 0;
 	priv->item_height = item_height;
     priv->visible_nr = ftk_widget_height(thiz)/item_height;
+
     priv->items_nr = priv->visible_nr * 2;
     priv->item_array = (ListItemInfo*)FTK_ALLOC(sizeof(ListItemInfo) * priv->items_nr);
+    memset(priv->item_array, 0, sizeof(ListItemInfo) * priv->items_nr);
+
     priv->initialized = 1;
     priv->position = 0;
     priv->index = 0;
@@ -688,7 +694,7 @@ FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int heigh
 Ret ftk_list_set_move_support(FtkWidget* thiz, int support)
 {
 	DECL_PRIV0(thiz, priv);
-	return_val_if_fail(thiz != NULL, RET_FAIL);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
 
 	priv->move_support = support;
 
