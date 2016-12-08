@@ -68,6 +68,7 @@ Ret ftk_list_item_set_selected(FtkWidget* thiz, int selected)
 static Ret ftk_list_item_on_event(FtkWidget* thiz, FtkEvent* event)
 {
 	Ret ret = RET_OK;
+#if 0
 	DECL_PRIV0(thiz, priv);
     return_val_if_fail(thiz != NULL, RET_FAIL);
 
@@ -102,6 +103,7 @@ static Ret ftk_list_item_on_event(FtkWidget* thiz, FtkEvent* event)
 		}
 		default:break;
 	}
+#endif
 
 	return ret;
 }

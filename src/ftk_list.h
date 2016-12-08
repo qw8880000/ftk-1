@@ -34,8 +34,10 @@ Ret ftk_list_remove(FtkWidget* thiz, int index);
 int ftk_list_get_total_page_num(FtkWidget* thiz);
 int ftk_list_get_cur_page_num(FtkWidget* thiz);
 
+#if 0
 Ret ftk_list_grab(FtkWidget* thiz, FtkWidget* grab_widget);
 Ret ftk_list_ungrab(FtkWidget* thiz, FtkWidget* grab_widget);
+#endif
 
 Ret ftk_list_set_clicked_listener(FtkWidget* thiz, FtkListener listener, void* ctx);
 int ftk_list_get_selected_position(FtkWidget* thiz);
