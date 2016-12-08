@@ -312,20 +312,27 @@ static Ret ftk_text_view_handle_move_evevnt(FtkWidget* thiz, FtkEvent* event)
         return RET_OK;
     }
 
-    if(abs(y-priv->last_mouse_pos) >= priv->delta)
+    if(priv->total_lines <= priv->visible_lines) {
+        return RET_OK;
+    }
+
+    if(abs(y - priv->last_mouse_pos) >= priv->delta)
     {
         if(y < priv->last_mouse_pos)            /* up */
         {
             priv->visible_start_line++;
-            if((priv->visible_start_line + priv->visible_lines) >= priv->visible_end_line)
+            priv->visible_end_line++;
+            if((priv->visible_start_line + priv->visible_lines) >= priv->total_lines)
             {
-                int visible_start = priv->visible_end_line - priv->visible_lines;
+                int visible_start = priv->total_lines - priv->visible_lines;
                 priv->visible_start_line = (visible_start >= 0) ? visible_start : 0;
+                priv->visible_end_line = priv->visible_start_line + FTK_MIN(priv->total_lines, priv->visible_lines);
             }
         }
         else                                    /* down */
         {
-            priv->visible_start_line = priv->visible_start_line > 0 ? priv->visible_start_line-1 : 0;
+            priv->visible_start_line = priv->visible_start_line > 0 ? priv->visible_start_line - 1 : 0;
+            priv->visible_end_line = priv->visible_start_line + FTK_MIN(priv->total_lines, priv->visible_lines);
         }
         
         priv->last_mouse_pos = y;
