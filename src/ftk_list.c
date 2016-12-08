@@ -488,7 +488,7 @@ static Ret ftk_list_move_items(FtkWidget* thiz, FtkEvent* event)
 
 #endif
 
-    priv->last_mouse_pos = event->u.mouse.y;
+    priv->last_mouse_pos = y;
     ftk_list_relayout(thiz);
 
     return RET_OK;
