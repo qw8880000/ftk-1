@@ -168,6 +168,7 @@ static Ret ftk_scroll_bar_on_paint(FtkWidget* thiz)
 	FTK_BEGIN_PAINT(x, y, width, height, canvas);
 
 	return_val_if_fail(priv->bitmap != NULL, RET_FAIL);
+    return_val_if_fail(priv->max_value > 0, RET_FAIL);
 
 	bitmap_width = ftk_bitmap_width(priv->bitmap);
 	bitmap_height = ftk_bitmap_height(priv->bitmap);

@@ -129,6 +129,7 @@ typedef struct _FtkWidgetCreateInfo
 	/*scroll bar*/
 	int max_value;
 	int page_delta;
+    FtkBitmap* bitmap;
 
 	/*text_view*/
 	int readonly;
@@ -605,6 +606,23 @@ static FtkWidget* ftk_xul_list_item_create(FtkWidgetCreateInfo* info)
     return widget;
 }
 
+static FtkWidget* ftk_xul_list_scroll_bar_create(FtkWidgetCreateInfo* info)
+{
+	FtkWidget* widget = NULL;
+	int value = 0;
+
+	widget = ftk_scroll_bar_create(info->parent, info->x, info->y, info->w, info->h);
+
+    if(info->bitmap != NULL)
+    {
+        ftk_scroll_bar_set_bitmap(widget, info->bitmap);
+    }
+
+    ftk_list_add_scroll_bar(info->parent, widget);
+
+    return widget;
+}
+
 static FtkWidget* ftk_xul_div_create(FtkWidgetCreateInfo* info)
 {
     FtkWidget* widget = NULL;
@@ -644,6 +662,7 @@ static const WidgetCreator s_widget_creaters[] =
     {"text_view",          ftk_xul_text_view_create,           1},
     {"list",               ftk_xul_list_create,                1},
     {"list_item",          ftk_xul_list_item_create,           1},
+    {"list_scroll_bar",    ftk_xul_list_scroll_bar_create,     1},
     {"div",                ftk_xul_div_create,                 1},
 	{NULL, NULL},
 };
@@ -1107,6 +1126,10 @@ static void ftk_xul_builder_init_widget_info(FtkXmlBuilder* thiz, const char** a
                 else if(strcmp(name, "bg_selected") == 0)
                 {
                     info->bg_selected = ftk_xul_load_image(info->priv->callbacks,value);
+                }
+                else if(strcmp(name, "bitmap") == 0)
+                {
+                    info->bitmap = ftk_xul_load_image(info->priv->callbacks,value);
                 }
 				else
 				{

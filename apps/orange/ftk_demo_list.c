@@ -74,8 +74,7 @@ static void ftk_demo_list_init(FtkWidget* win)
         .get_item_ctx = NULL
     };
 
-    ftk_list_set_total(list, 20);
-    ftk_list_init(list, &callbacks);
+    ftk_list_init(list, 20, &callbacks);
 }
 
 static Ret ftk_demo_list_on_button_clicked(void* ctx, void* obj)

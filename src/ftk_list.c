@@ -46,6 +46,7 @@
 #include "ftk_xul.h"
 #include "ftk_list.h"
 #include "ftk_list_item.h"
+#include "ftk_scroll_bar.h"
 
 
 /*-----------------------------------------------------------------------------
@@ -90,6 +91,9 @@ typedef struct _ListPrivInfo
     int last_mouse_pos;
     int delta;
     int moved;
+
+	FtkWidget* scroll_bar;
+    /* int scroll_bar_value; */
 	
 	void* listener_ctx;
 	FtkListener listener;
@@ -278,7 +282,7 @@ Ret ftk_list_set_item_height(FtkWidget* thiz, int item_height)
     return RET_OK;
 }
 
-Ret ftk_list_init(FtkWidget* thiz, FtkListCallBacks* callbacks)
+Ret ftk_list_init(FtkWidget* thiz, int total, FtkListCallBacks* callbacks)
 {
 	DECL_PRIV0(thiz, priv);
     int item_height = priv->item_height;
@@ -303,17 +307,38 @@ Ret ftk_list_init(FtkWidget* thiz, FtkListCallBacks* callbacks)
     priv->index = 0;
     priv->delta = 6;
     priv->selected = 0;
+
+    priv->total = total;
+
     memcpy(&priv->callbacks, callbacks, sizeof(FtkListCallBacks));
+
+    if(priv->scroll_bar != NULL)
+    {
+        ftk_scroll_bar_set_param(priv->scroll_bar, priv->position, priv->total, priv->visible_nr);
+    }
 
     ftk_list_create_items(thiz, priv->items_nr);
 
-    /* ftk_logi("-->%s, item_height=%d,visible_nr=%d\n", __func__, priv->item_height, priv->visible_nr); */
     ftk_list_relayout(thiz);
 
     return RET_OK;
 }
 
-static Ret ftk_list_mouse_move(FtkWidget* thiz, FtkEvent* event)
+static Ret ftk_list_move_scroll_bar(FtkWidget* thiz, FtkEvent* event)
+{
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+    return_val_if_fail(priv->scroll_bar, RET_FAIL);
+
+    if(ftk_scroll_bar_get_value(priv->scroll_bar) != priv->position)
+    {
+        ftk_scroll_bar_set_value(priv->scroll_bar, priv->position);
+    }
+
+    return RET_OK;
+}
+
+static Ret ftk_list_move_items(FtkWidget* thiz, FtkEvent* event)
 {
 
 #define MOVE_UP 1
@@ -463,7 +488,7 @@ static Ret ftk_list_mouse_move(FtkWidget* thiz, FtkEvent* event)
 
 #endif
 
-    priv->last_mouse_pos = y;
+    priv->last_mouse_pos = event->u.mouse.y;
     ftk_list_relayout(thiz);
 
     return RET_OK;
@@ -631,7 +656,8 @@ static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
         {
             if(priv->move_support)
             {
-                ftk_list_mouse_move(thiz, event);
+                ftk_list_move_scroll_bar(thiz, event);
+                ftk_list_move_items(thiz, event);
             }
             break;
         }
@@ -714,6 +740,7 @@ Ret ftk_list_set_move_support(FtkWidget* thiz, int support)
 	return RET_OK;
 }
 
+#if  0     /* ----- #if 0 : If0Label_1 ----- */
 Ret ftk_list_set_total(FtkWidget* thiz, int nr)
 {
     DECL_PRIV0(thiz, priv);
@@ -723,6 +750,8 @@ Ret ftk_list_set_total(FtkWidget* thiz, int nr)
 
     return RET_OK;
 }
+#endif     /* ----- #if 0 : If0Label_1 ----- */
+
 
 Ret ftk_list_page_prev(FtkWidget* thiz)
 {
@@ -915,4 +944,16 @@ int ftk_list_get_selected_position(FtkWidget* thiz)
 
 	return priv->selected;
 }
+
+Ret ftk_list_add_scroll_bar(FtkWidget* thiz, FtkWidget* scroll_bar)
+{
+    DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+
+	priv->scroll_bar = scroll_bar;
+
+
+	return RET_OK;
+}
+
 

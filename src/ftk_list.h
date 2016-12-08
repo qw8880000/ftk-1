@@ -21,10 +21,10 @@ typedef struct _FtkListCallBacks
 FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int height);
 
 Ret ftk_list_set_move_support(FtkWidget* thiz, int support);
-Ret ftk_list_set_total(FtkWidget* thiz, int nr);
+// Ret ftk_list_set_total(FtkWidget* thiz, int nr);
 
 Ret ftk_list_set_item_height(FtkWidget* thiz, int item_height);
-Ret ftk_list_init(FtkWidget* thiz, FtkListCallBacks* callbacks);
+Ret ftk_list_init(FtkWidget* thiz, int total, FtkListCallBacks* callbacks);
 // Ret ftk_list_refresh(FtkWidget* thiz);
 
 Ret ftk_list_page_prev(FtkWidget* thiz);
@@ -41,6 +41,8 @@ Ret ftk_list_ungrab(FtkWidget* thiz, FtkWidget* grab_widget);
 
 Ret ftk_list_set_clicked_listener(FtkWidget* thiz, FtkListener listener, void* ctx);
 int ftk_list_get_selected_position(FtkWidget* thiz);
+
+Ret ftk_list_add_scroll_bar(FtkWidget* thiz, FtkWidget* scroll_bar);
 
 FTK_END_DECLS
 
