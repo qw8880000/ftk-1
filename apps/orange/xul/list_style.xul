@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<list_item x="0" y="0" w="300" h="50" visible="0" 
+<list_item x="0" y="0" w="320" h="50" visible="0" 
     bg_selected="list_selector_background_focus.png"
     bg_image[normal]="list_selector_background_normal.png"
     bg_image[active]="list_selector_background_normal.png"

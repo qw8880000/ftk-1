@@ -952,8 +952,6 @@ Ret ftk_list_add_scroll_bar(FtkWidget* thiz, FtkWidget* scroll_bar)
 
 	priv->scroll_bar = scroll_bar;
 
-
 	return RET_OK;
 }
-
 
