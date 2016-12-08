@@ -160,63 +160,56 @@ static Ret ftk_scroll_bar_on_paint(FtkWidget* thiz)
 	int i = 0;
 	int dx = 0;
 	int dy = 0;
-	int fill_size = 0;
-	int half_size = 0;
-	int bitmap_width = 0;
-	int bitmap_height = 0;
+    FtkRect tracker_rect = {0};
 	DECL_PRIV0(thiz, priv);
 	FTK_BEGIN_PAINT(x, y, width, height, canvas);
 
 	return_val_if_fail(priv->bitmap != NULL, RET_FAIL);
     return_val_if_fail(priv->max_value > 0, RET_FAIL);
 
-	bitmap_width = ftk_bitmap_width(priv->bitmap);
-	bitmap_height = ftk_bitmap_height(priv->bitmap);
-	
 	if(priv->vertical)
-	{
+    {
 		priv->tracker_size = height * priv->page_delta/priv->max_value;
-		priv->tracker_size = priv->tracker_size < bitmap_height ? bitmap_height : priv->tracker_size;
 
 		dy = height * priv->value / priv->max_value;
 		dy = (dy + priv->tracker_size) < height ? dy : height - priv->tracker_size;
 	
 		priv->tracker_pos = dy + ftk_widget_top_abs(thiz);
-		fill_size = priv->tracker_size - bitmap_height;
 
-		dx += x;
-		dy += y;
-		half_size = bitmap_height/2;
-		
-		ftk_canvas_draw_bitmap_simple(canvas, priv->bitmap, 0, 0, bitmap_width, half_size, dx, dy);
-		for(i = 0; i < fill_size; i++)
-		{
-			ftk_canvas_draw_bitmap_simple(canvas, priv->bitmap, 0, half_size, bitmap_width, 1, dx, dy + i + half_size);
-		}
-		ftk_canvas_draw_bitmap_simple(canvas, priv->bitmap, 0, half_size, bitmap_width, half_size, dx, dy + half_size + fill_size);
-	}
-	else
-	{
-		priv->tracker_size = width * priv->page_delta/priv->max_value;
-		priv->tracker_size = priv->tracker_size < bitmap_width ? bitmap_width : priv->tracker_size;
+        tracker_rect.x = x;
+        tracker_rect.y = y + dy;
+        tracker_rect.width = width; 
+        tracker_rect.height = priv->tracker_size;
+    }
+    else
+    {
+        priv->tracker_size = width * priv->page_delta/priv->max_value;
 
 		dx = width * priv->value / priv->max_value;
 		dx = (dx + priv->tracker_size) < width ? dx : width - priv->tracker_size;
 	
 		priv->tracker_pos = dx + ftk_widget_left_abs(thiz);
-		fill_size = priv->tracker_size - bitmap_width;
 
-		dy += y;
-		dx += x;
-		half_size = bitmap_width/2;
-		
-		ftk_canvas_draw_bitmap_simple(canvas, priv->bitmap, 0, 0, half_size, bitmap_height, dx, dy);
-		for(i = 0; i < fill_size; i++)
-		{
-			ftk_canvas_draw_bitmap_simple(canvas, priv->bitmap, half_size, 0, 1, bitmap_height, dx + i + half_size, dy);
-		}
-		ftk_canvas_draw_bitmap_simple(canvas, priv->bitmap, half_size, 0, half_size, bitmap_height, dx + fill_size + half_size, dy);
-	}
+        tracker_rect.x = x + dx;
+        tracker_rect.y = y;
+        tracker_rect.width = priv->tracker_size; 
+        tracker_rect.height = height;
+    }
+
+    /* ftk_logw("%s->(%d,%d,%d,%d)\n", __func__, tracker_rect.x, tracker_rect.y, tracker_rect.width, tracker_rect.height); */
+
+    if(ftk_widget_has_attr(thiz, FTK_ATTR_BG_CENTER))
+    {
+        ftk_canvas_draw_bg_image(canvas, priv->bitmap, FTK_BG_CENTER, tracker_rect.x, tracker_rect.y, tracker_rect.width, tracker_rect.height);
+    }
+    else if(ftk_widget_has_attr(thiz, FTK_ATTR_BG_FOUR_CORNER))
+    {
+        ftk_canvas_draw_bg_image(canvas, priv->bitmap, FTK_BG_FOUR_CORNER, tracker_rect.x, tracker_rect.y, tracker_rect.width, tracker_rect.height);
+    }
+    else
+    {
+        ftk_canvas_draw_bg_image(canvas, priv->bitmap, FTK_BG_NORMAL, tracker_rect.x, tracker_rect.y, tracker_rect.width, tracker_rect.height);
+    }
 
 	FTK_END_PAINT();
 }
@@ -252,7 +245,6 @@ FtkWidget* ftk_scroll_bar_create(FtkWidget* parent, int x, int y, int width, int
 			priv->vertical = 1;
 			priv->bitmap = ftk_theme_load_image(ftk_default_theme(), 
 				"scrollbar_handle_vertical"FTK_STOCK_IMG_SUFFIX);
-
             /* priv->bitmap may be NULL, and setted behind*/
 			/* width = ftk_bitmap_width(priv->bitmap); */
 			/* assert(width < height); */
