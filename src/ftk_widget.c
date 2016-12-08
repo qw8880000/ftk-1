@@ -1384,8 +1384,6 @@ Ret ftk_widget_paint_self(FtkWidget* thiz, FtkRect *rects, int rect_nr)
         priv->painting++;
         assert(parent == NULL || ftk_widget_paint_called_by_parent(thiz));
 
-#if defined(FTK_OPTIMIZE_WIDGET_PAINT) && (FTK_OPTIMIZE_WIDGET_PAINT > 0)
-
         /* set special rect to clips, in order to clip the thiz */
         if(parent_special != NULL)
         {
@@ -1397,6 +1395,7 @@ Ret ftk_widget_paint_self(FtkWidget* thiz, FtkRect *rects, int rect_nr)
             ftk_canvas_set_clip_special_rect(canvas, &rect);
         }
 
+#if defined(FTK_OPTIMIZE_WIDGET_PAINT) && (FTK_OPTIMIZE_WIDGET_PAINT > 0)
 
         if (rect_nr > 0 && rects != NULL && ftk_widget_parent(thiz) == NULL)
         {
