@@ -874,50 +874,44 @@ static Ret ftk_canvas_default_draw_string(FtkCanvas* thiz, int x, int y,
 		}
 		else if(code == '\t')
 		{
-			x += FTK_TAB_WIDTH * FTK_SPACE_WIDTH;
-			ox = x;
-			continue;
-		}
+            x += FTK_TAB_WIDTH * FTK_SPACE_WIDTH;
+            ox = x;
+            continue;
+        }
 
-		if(code == 0xffff || code == 0) break;
-		if(code == '\r' || code == '\n' || ftk_font_lookup(priv->font, code, &glyph) != RET_OK) 
-			continue;
+        if(code == 0xffff || code == 0) break;
+        if(code == '\r' || code == '\n' || ftk_font_lookup(priv->font, code, &glyph) != RET_OK) 
+            continue;
 
-		glyph.y = vcenter ? glyph.y - vcenter_offset : glyph.y;
-		if((x + glyph.x + glyph.w) >= right) break;
-		if((y - glyph.y + glyph.h) >= bottom) break;
+        glyph.y = vcenter ? glyph.y - vcenter_offset : glyph.y;
+        if((x + glyph.x + glyph.w) >= right) break;
+        if((y - glyph.y + glyph.h) >= bottom) break;
 
-		x = x + glyph.x;
-		y = y - glyph.y;
-
-		glyph_rect.x = x;
-		glyph_rect.y = y;
-		glyph_rect.width = glyph.w;
-		glyph_rect.height = glyph.h;
-		
-		if ( ftk_rect_and(&clip, &glyph_rect, &rect) == RET_OK )
-		{
-			for(i = rect.y - glyph_rect.y; i < rect.height; i++,y++)
-			{
-				for(j = rect.x - glyph_rect.x, x = ox; j < rect.width; j++,x++)
-				{
-					data = glyph.data[i * glyph.w + j];
-					offset = y * priv->w + x;
-					bg = bits[offset];
-					if(data)
-					{
-						color.r = FTK_ALPHA_1(fg.r, bg.r, data);
-						color.g = FTK_ALPHA_1(fg.g, bg.g, data);
-						color.b = FTK_ALPHA_1(fg.b, bg.b, data);
-						*(unsigned int*)(bits+offset) = *(unsigned int*)&color;
-					}
-				}
-			}
-		}
-
-		y = oy;
-		x = ox + glyph.x + glyph.w + 1;
-		ox = x;
+        x = x + glyph.x;
+        y = y - glyph.y;
+        for(i = 0; i < glyph.h; i++,y++)
+        {
+            for(j = 0, x= ox; j < glyph.w; j++,x++)
+            {
+                if(!FTK_POINT_IN_RECT(x, y, clip))
+                {
+                    break;
+                }
+                data = glyph.data[i * glyph.w + j];
+                offset = y * priv->w + x;
+                bg = bits[offset];
+                if(data)
+                {
+                    color.r = FTK_ALPHA_1(fg.r, bg.r, data);
+                    color.g = FTK_ALPHA_1(fg.g, bg.g, data);
+                    color.b = FTK_ALPHA_1(fg.b, bg.b, data);
+                    *(unsigned int*)(bits+offset) = *(unsigned int*)&color;
+                }
+            }
+        }
+        y = oy;
+        x = ox + glyph.x + glyph.w + 1;
+        ox = x;
 	}
 
 	return RET_OK;
