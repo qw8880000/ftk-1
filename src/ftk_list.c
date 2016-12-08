@@ -328,7 +328,7 @@ static Ret ftk_list_move_scroll_bar(FtkWidget* thiz, FtkEvent* event)
 {
 	DECL_PRIV0(thiz, priv);
     return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
-    return_val_if_fail(priv->scroll_bar, RET_FAIL);
+    return_val_if_fail(priv->scroll_bar != NULL, RET_FAIL);
 
     if(ftk_scroll_bar_get_value(priv->scroll_bar) != priv->position)
     {
