@@ -252,16 +252,18 @@ FtkWidget* ftk_scroll_bar_create(FtkWidget* parent, int x, int y, int width, int
 			priv->vertical = 1;
 			priv->bitmap = ftk_theme_load_image(ftk_default_theme(), 
 				"scrollbar_handle_vertical"FTK_STOCK_IMG_SUFFIX);
-			width = ftk_bitmap_width(priv->bitmap);
-			assert(width < height);
+
+            /* priv->bitmap may be NULL, and setted behind*/
+			/* width = ftk_bitmap_width(priv->bitmap); */
+			/* assert(width < height); */
 		}
 		else
 		{
 			priv->vertical = 0;
 			priv->bitmap = ftk_theme_load_image(ftk_default_theme(), 
 				"scrollbar_handle_horizontal"FTK_STOCK_IMG_SUFFIX);
-			height = ftk_bitmap_height(priv->bitmap);	
-			assert(width > height);
+			/* height = ftk_bitmap_height(priv->bitmap);	 */
+			/* assert(width > height); */
 		}
 
 		ftk_widget_init(thiz, width < height ? FTK_SCROLL_VBAR : FTK_SCROLL_HBAR, 0, 
