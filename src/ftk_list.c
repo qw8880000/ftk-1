@@ -328,7 +328,7 @@ static Ret ftk_list_move_scroll_bar(FtkWidget* thiz, FtkEvent* event)
 {
 	DECL_PRIV0(thiz, priv);
     return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
-    return_val_if_fail(priv->scroll_bar, RET_FAIL);
+    return_val_if_fail(priv->scroll_bar != NULL, RET_FAIL);
 
     if(ftk_scroll_bar_get_value(priv->scroll_bar) != priv->position)
     {
@@ -488,7 +488,7 @@ static Ret ftk_list_move_items(FtkWidget* thiz, FtkEvent* event)
 
 #endif
 
-    priv->last_mouse_pos = event->u.mouse.y;
+    priv->last_mouse_pos = y;
     ftk_list_relayout(thiz);
 
     return RET_OK;
@@ -952,8 +952,6 @@ Ret ftk_list_add_scroll_bar(FtkWidget* thiz, FtkWidget* scroll_bar)
 
 	priv->scroll_bar = scroll_bar;
 
-
 	return RET_OK;
 }
-
 

@@ -345,6 +345,11 @@ static FtkWidget* ftk_xul_scroll_bar_create(FtkWidgetCreateInfo* info)
 		ftk_scroll_bar_set_param(widget, value, info->max_value, info->page_delta);
 	}
 
+    if(info->bitmap != NULL)
+    {
+        ftk_scroll_bar_set_bitmap(widget, info->bitmap);
+    }
+
 	return widget;
 }
 
@@ -606,23 +611,6 @@ static FtkWidget* ftk_xul_list_item_create(FtkWidgetCreateInfo* info)
     return widget;
 }
 
-static FtkWidget* ftk_xul_list_scroll_bar_create(FtkWidgetCreateInfo* info)
-{
-	FtkWidget* widget = NULL;
-	int value = 0;
-
-	widget = ftk_scroll_bar_create(info->parent, info->x, info->y, info->w, info->h);
-
-    if(info->bitmap != NULL)
-    {
-        ftk_scroll_bar_set_bitmap(widget, info->bitmap);
-    }
-
-    ftk_list_add_scroll_bar(info->parent, widget);
-
-    return widget;
-}
-
 static FtkWidget* ftk_xul_div_create(FtkWidgetCreateInfo* info)
 {
     FtkWidget* widget = NULL;
@@ -662,7 +650,6 @@ static const WidgetCreator s_widget_creaters[] =
     {"text_view",          ftk_xul_text_view_create,           1},
     {"list",               ftk_xul_list_create,                1},
     {"list_item",          ftk_xul_list_item_create,           1},
-    {"list_scroll_bar",    ftk_xul_list_scroll_bar_create,     1},
     {"div",                ftk_xul_div_create,                 1},
 	{NULL, NULL},
 };

@@ -26,11 +26,12 @@
 #include "ftk_orange_xul.h"
 
 enum{
-    IDX_LIST   = 2,
-    IDX_PREV   = 100,
-    IDX_NEXT   = 101,
-    IDX_REMOVE = 102,
-    IDX_CLEAR  = 103,
+    IDX_LIST       = 2,
+    IDX_SCROLL_BAR = 10,
+    IDX_PREV       = 100,
+    IDX_NEXT       = 101,
+    IDX_REMOVE     = 102,
+    IDX_CLEAR      = 103,
 
 };
 
@@ -67,6 +68,7 @@ FtkWidget* demo_list_get_item(FtkWidget* list, int index, void* ctx)
 static void ftk_demo_list_init(FtkWidget* win)
 {
     FtkWidget* list = ftk_widget_lookup(win, IDX_LIST);
+    FtkWidget* scroll_bar = ftk_widget_lookup(win, IDX_SCROLL_BAR);
     FtkListCallBacks callbacks = {
         .validate_item = demo_list_item_validate,
         .validate_item_ctx = NULL,
@@ -74,6 +76,7 @@ static void ftk_demo_list_init(FtkWidget* win)
         .get_item_ctx = NULL
     };
 
+    ftk_list_add_scroll_bar(list, scroll_bar);
     ftk_list_init(list, 20, &callbacks);
 }
 
