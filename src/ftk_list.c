@@ -101,6 +101,7 @@ typedef struct _ListPrivInfo
     FtkListCallBacks callbacks;
 }PrivInfo;
 
+
 static ListItemInfo* ftk_list_get_item(FtkWidget* thiz, int index)
 {
 	DECL_PRIV0(thiz, priv);
@@ -110,19 +111,43 @@ static ListItemInfo* ftk_list_get_item(FtkWidget* thiz, int index)
     return priv->item_array + (index % priv->items_nr);
 }
 
-static Ret ftk_list_on_item_change(FtkWidget* thiz, FtkWidget* item, int position, int active)
+static int ftk_list_get_item_index(FtkWidget* thiz, FtkWidget* widget)
+{
+    int i = 0;
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL && priv != NULL, -1);
+    return_val_if_fail(widget != NULL, -1);
+
+    for(i = 0; i < priv->items_nr; i++)
+    {
+        ListItemInfo* item = ftk_list_get_item(thiz, i);
+        if(item->widget == widget)
+        {
+            return i;
+        }
+    }
+
+    return -1;
+}
+
+static Ret ftk_list_on_item_refresh(FtkWidget* thiz, FtkWidget* item, int active)
 {
     int c = 0;
+    int index = ftk_list_get_item_index(thiz, item);
+    int position = -1;
     FtkWidget* container = item;
     FtkWidget* iter = NULL;
 	DECL_PRIV0(thiz, priv);
     return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
     return_val_if_fail(item != NULL, RET_FAIL);
+    return_val_if_fail(index >= 0, RET_FAIL);
 
     if(priv->callbacks.validate_item == NULL)
     {
         return RET_OK;
     }
+
+    position = priv->position + index - priv->index;
 
     iter = ftk_widget_child(container);
     for(; iter != NULL; iter = ftk_widget_next(iter), c++)
@@ -137,7 +162,6 @@ static Ret ftk_list_set_item_active(FtkWidget* thiz, int index)
 {
     ListItemInfo* item = ftk_list_get_item(thiz, index);
 	DECL_PRIV0(thiz, priv);
-    int position = priv->position + (index - priv->index);
     return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
     return_val_if_fail(item != NULL, RET_FAIL);
     return_val_if_fail(item->widget != NULL, RET_FAIL);
@@ -145,19 +169,11 @@ static Ret ftk_list_set_item_active(FtkWidget* thiz, int index)
     if(item->active == 0)       /* scrap change to active */
     {
         item->active = 1;                  
-        ftk_list_on_item_change(thiz, item->widget, position, 1);
-    }
-
-    if(position == priv->selected)
-    {
-        ftk_list_item_set_selected(item->widget, 1);
-    }
-    else
-    {
-        ftk_list_item_set_selected(item->widget, 0);
+        ftk_list_on_item_refresh(thiz, item->widget, 1);
     }
 
     ftk_widget_set_visible(item->widget, 1);
+    ftk_widget_hide_self(item->widget, 0);
 
     return RET_OK;
 }
@@ -245,7 +261,6 @@ static Ret ftk_list_reset_items(FtkWidget* thiz)
     return RET_OK;
 }
 
-
 static Ret ftk_list_create_items(FtkWidget* thiz, int nr)
 {
     int i = 0;
@@ -257,6 +272,7 @@ static Ret ftk_list_create_items(FtkWidget* thiz, int nr)
     for(i = 0; i < nr; i++)
     {
         ListItemInfo* item = priv->item_array + i;
+        /* FtkWidget* list_item = ftk_list_style_xul_load(priv->item_style); */
         FtkWidget* list_item = priv->callbacks.get_item(thiz, i, priv->callbacks.get_item_ctx);
 
         if(list_item != NULL)
@@ -268,58 +284,6 @@ static Ret ftk_list_create_items(FtkWidget* thiz, int nr)
             item->active = 0;
         }
     }
-
-    return RET_OK;
-}
-
-Ret ftk_list_set_item_height(FtkWidget* thiz, int item_height)
-{
-	DECL_PRIV0(thiz, priv);
-    return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
-
-    priv->item_height =item_height;
-
-    return RET_OK;
-}
-
-Ret ftk_list_init(FtkWidget* thiz, int total, FtkListCallBacks* callbacks)
-{
-	DECL_PRIV0(thiz, priv);
-    int item_height = priv->item_height;
-    return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
-    return_val_if_fail(item_height > 0, RET_FAIL);
-
-    if(priv->initialized)
-    {
-        return RET_OK;
-    }
-
-    priv->y_offset = 0;
-	priv->item_height = item_height;
-    priv->visible_nr = ftk_widget_height(thiz)/item_height;
-
-    priv->items_nr = priv->visible_nr * 2;
-    priv->item_array = (ListItemInfo*)FTK_ALLOC(sizeof(ListItemInfo) * priv->items_nr);
-    memset(priv->item_array, 0, sizeof(ListItemInfo) * priv->items_nr);
-
-    priv->initialized = 1;
-    priv->position = 0;
-    priv->index = 0;
-    priv->delta = 6;
-    priv->selected = 0;
-
-    priv->total = total;
-
-    memcpy(&priv->callbacks, callbacks, sizeof(FtkListCallBacks));
-
-    if(priv->scroll_bar != NULL)
-    {
-        ftk_scroll_bar_set_param(priv->scroll_bar, priv->position, priv->total, priv->visible_nr);
-    }
-
-    ftk_list_create_items(thiz, priv->items_nr);
-
-    ftk_list_relayout(thiz);
 
     return RET_OK;
 }
@@ -494,38 +458,28 @@ static Ret ftk_list_move_items(FtkWidget* thiz, FtkEvent* event)
     return RET_OK;
 }
 
-static int ftk_list_get_item_index(FtkWidget* thiz, FtkWidget* widget)
-{
-    int i = 0;
-	DECL_PRIV0(thiz, priv);
-    return_val_if_fail(thiz != NULL && priv != NULL, -1);
-    return_val_if_fail(widget != NULL, -1);
-
-    for(i = 0; i < priv->items_nr; i++)
-    {
-        ListItemInfo* item = ftk_list_get_item(thiz, i);
-        if(item->widget == widget)
-        {
-            return i;
-        }
-    }
-
-    return -1;
-}
-
 static Ret ftk_list_set_selected(FtkWidget* thiz, FtkWidget* item)
 {
     int index = ftk_list_get_item_index(thiz, item);
+    FtkWidget* old_selected = NULL;
 	DECL_PRIV0(thiz, priv);
     return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
     return_val_if_fail(priv->items_nr > 0, RET_FAIL);
+    return_val_if_fail(item != NULL, RET_FAIL);
 
-    if(index != -1)
+    if(priv->selected >= 0)
     {
-        priv->selected = priv->position + (index - priv->index + priv->items_nr) % priv->items_nr;
-        /* ftk_logi("--> %s : position=%d, index=%d, offset=%d\n", __func__, priv->position, priv->index, index); */
-
+        ListItemInfo* info = ftk_list_get_item(thiz, priv->selected);
+        if(info != NULL)
+        {
+            old_selected = info->widget;
+        }
     }
+
+    priv->selected = priv->position + (index - priv->index + priv->items_nr) % priv->items_nr;
+
+    ftk_list_item_set_selected(old_selected, 0);
+    ftk_list_item_set_selected(item, 1);
 
     return RET_OK;
 }
@@ -628,13 +582,16 @@ static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
 
             if(priv->moved == 0)                /* if has moved, insensitive to MOUSE_UP */
             {
-                FtkWidget* target = ftk_list_find_target(thiz, x, y);
-                ftk_list_set_selected(thiz, target);
-                ftk_list_relayout(thiz);
-
                 if(FTK_POINT_IN_WIDGET(x, y, thiz))
                 {
+                    FtkWidget* target = ftk_list_find_target(thiz, x, y);
+
+                    ftk_list_set_selected(thiz, target);
+
                     ret = FTK_CALL_LISTENER(priv->listener, priv->listener_ctx, thiz);
+
+                    ftk_list_on_item_refresh(thiz, target, 1);
+                    ftk_widget_invalidate(thiz);
                 }
             }
 
@@ -702,6 +659,60 @@ static void ftk_list_destroy(FtkWidget* thiz)
 	}
 
 	return;
+}
+
+Ret ftk_list_set_item_height(FtkWidget* thiz, int item_height)
+{
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+
+    priv->item_height =item_height;
+
+    return RET_OK;
+}
+
+Ret ftk_list_init(FtkWidget* thiz, int total, FtkListCallBacks* callbacks)
+{
+	DECL_PRIV0(thiz, priv);
+    int item_height = priv->item_height;
+    return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+    return_val_if_fail(item_height > 0, RET_FAIL);
+
+    if(priv->initialized)
+    {
+        return RET_OK;
+    }
+
+    priv->y_offset = 0;
+	priv->item_height = item_height;
+    priv->visible_nr = ftk_widget_height(thiz)/item_height;
+
+    priv->items_nr = priv->visible_nr * 2;
+    priv->item_array = (ListItemInfo*)FTK_ALLOC(sizeof(ListItemInfo) * priv->items_nr);
+    memset(priv->item_array, 0, sizeof(ListItemInfo) * priv->items_nr);
+
+    priv->initialized = 1;
+    priv->position = 0;
+    priv->index = 0;
+    priv->delta = 5;
+    priv->selected = 0;
+
+    priv->total = total;
+
+    memcpy(&priv->callbacks, callbacks, sizeof(FtkListCallBacks));
+
+    if(priv->scroll_bar != NULL)
+    {
+        ftk_scroll_bar_set_param(priv->scroll_bar, priv->position, priv->total, priv->visible_nr);
+    }
+
+    ftk_list_create_items(thiz, priv->items_nr);
+
+    ftk_list_set_selected(thiz, ftk_widget_child(thiz));
+
+    ftk_list_relayout(thiz);
+
+    return RET_OK;
 }
 
 FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int height)
