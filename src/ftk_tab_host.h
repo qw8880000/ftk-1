@@ -29,32 +29,25 @@
  *
  */
 
-#ifndef FTK_TAB_H
-#define FTK_TAB_H
+#ifndef FTK_TAB_HOST_H
+#define FTK_TAB_HOST_H
 
 #include "ftk_widget.h"
 
 FTK_BEGIN_DECLS
 
-FtkWidget* ftk_tab_create(FtkWidget* parent, int x, int y, int width, int height);
-Ret ftk_tab_add_title(FtkWidget* thiz, FtkWidget* title);
-Ret ftk_tab_add_page(FtkWidget* thiz, FtkWidget* page);
+FtkWidget* ftk_tab_host_create(FtkWidget* parent, int x, int y, int width, int height);
+Ret ftk_tab_host_add_title(FtkWidget* thiz, FtkWidget* title);
+Ret ftk_tab_host_add_page(FtkWidget* thiz, FtkWidget* page);
 
-Ret ftk_tab_click_title(FtkWidget* thiz, FtkWidget* title);
-Ret ftk_tab_set_selected(FtkWidget* thiz, int index);
+Ret ftk_tab_host_click_title(FtkWidget* thiz, FtkWidget* title);
 
-int ftk_tab_get_title_index(FtkWidget* thiz, FtkWidget* title);
-int ftk_tab_get_selected_title_index(FtkWidget* thiz);
-#if 0
-int     ftk_tab_get_page_count(FtkWidget* thiz);
-FtkWidget* ftk_tab_get_page(FtkWidget* thiz, int index);
-int        ftk_tab_get_page_index(FtkWidget* thiz, FtkWidget* page);
+int ftk_tab_host_get_title_index(FtkWidget* thiz, FtkWidget* title);
 
-int     ftk_tab_get_title_count(FtkWidget* thiz);
-FtkWidget* ftk_tab_get_title(FtkWidget* thiz, int index);
-#endif
+Ret ftk_tab_host_set_selected_title_by_index(FtkWidget* thiz, int index);
+int ftk_tab_host_get_selected_title_index(FtkWidget* thiz);
 
 FTK_END_DECLS
 
-#endif/*FTK_TAB_H*/
+#endif/*FTK_TAB_HOST_H*/
 
