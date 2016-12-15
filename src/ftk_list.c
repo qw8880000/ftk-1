@@ -147,7 +147,7 @@ static Ret ftk_list_on_item_refresh(FtkWidget* thiz, FtkWidget* item, int active
         return RET_OK;
     }
 
-    position = priv->position + index - priv->index;
+    position = priv->position + (index - priv->index + priv->items_nr) % priv->items_nr;
 
     iter = ftk_widget_child(container);
     for(; iter != NULL; iter = ftk_widget_next(iter), c++)
@@ -161,6 +161,7 @@ static Ret ftk_list_on_item_refresh(FtkWidget* thiz, FtkWidget* item, int active
 static Ret ftk_list_set_item_active(FtkWidget* thiz, int index)
 {
     ListItemInfo* item = ftk_list_get_item(thiz, index);
+    int position = -1;
 	DECL_PRIV0(thiz, priv);
     return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
     return_val_if_fail(item != NULL, RET_FAIL);
@@ -170,6 +171,16 @@ static Ret ftk_list_set_item_active(FtkWidget* thiz, int index)
     {
         item->active = 1;                  
         ftk_list_on_item_refresh(thiz, item->widget, 1);
+    }
+
+    position = priv->position + (index - priv->index + priv->items_nr) % priv->items_nr;
+    if(priv->selected != position)
+    {
+        ftk_list_item_set_selected(item->widget, 0);
+    }
+    else
+    {
+        ftk_list_item_set_selected(item->widget, 1);
     }
 
     ftk_widget_set_visible(item->widget, 1);
@@ -211,6 +222,7 @@ static Ret ftk_list_relayout(FtkWidget* thiz)
 	DECL_PRIV0(thiz, priv);
     int total = priv->total;
     return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+    return_val_if_fail(priv->items_nr > 0, RET_FAIL);
 
     if(total - priv->position <= priv->visible_nr)
     {
@@ -230,7 +242,7 @@ static Ret ftk_list_relayout(FtkWidget* thiz)
 
     for(i = 0; i < visible_nr; i++)             /* show */
     {
-        index = priv->index + i;
+        index = (priv->index + i) % priv->items_nr;
         ftk_list_set_item_active(thiz, index);
         ftk_list_set_item_position(thiz, index, priv->y_offset + priv->item_height * i);
         /* ftk_logi("-->%s, visible_nr=%d, y=%d\n", __func__, visible_nr, priv->y_offset + priv->item_height * i); */
@@ -238,7 +250,7 @@ static Ret ftk_list_relayout(FtkWidget* thiz)
 
     for(i = 0; i < priv->items_nr - visible_nr; i++) /* hide */
     {
-        index = priv->index + visible_nr + i;
+        index = (priv->index + visible_nr + i) % priv->items_nr;
         ftk_list_set_item_scrap(thiz, index);
     }
 
@@ -349,53 +361,6 @@ static Ret ftk_list_move_items(FtkWidget* thiz, FtkEvent* event)
      *
      *-----------------------------------------------------------------------------*/
 
-#if 0
-    if(move == MOVE_UP)            /* up */
-    {
-        if(priv->y_offset == 0 && priv->position + priv->visible_nr >= total)
-        {
-            return RET_OK;
-        }
-
-        /* priv->y_offset -= abs(y - priv->last_mouse_pos); */
-        priv->y_offset -= priv->delta;
-
-        if(priv->y_offset < 0 && abs(priv->y_offset) >= priv->item_height)
-        {
-            priv->index = (priv->index + 1) % priv->items_nr;
-            priv->position += 1;
-
-            if(priv->position + priv->visible_nr >= total)
-            {
-                priv->y_offset = 0;
-            }
-            else
-            {
-                priv->y_offset = priv->y_offset + priv->item_height;
-            }
-        }
-    }
-    else                                    /* down */
-    {
-        if((priv->y_offset <= 0 && priv->y_offset + priv->delta >=0) && priv->position <= 0)
-        {
-            priv->y_offset = 0;
-            return RET_OK;
-        }
-
-        priv->y_offset += priv->delta;
-        /* priv->y_offset += abs(y - priv->last_mouse_pos); */
-        if(priv->y_offset > 0 && (priv->y_offset - priv->delta) <= 0)
-        {
-            priv->index = (priv->index - 1 + priv->items_nr) % priv->items_nr;
-            priv->position -= 1;
-
-            priv->y_offset = priv->y_offset - priv->item_height;
-
-        }
-    }
-#else
-
     priv->moved = 1;
 
     if(move == MOVE_UP)            /* up */
@@ -450,8 +415,6 @@ static Ret ftk_list_move_items(FtkWidget* thiz, FtkEvent* event)
         }
     }
 
-#endif
-
     priv->last_mouse_pos = y;
     ftk_list_relayout(thiz);
 
@@ -461,25 +424,25 @@ static Ret ftk_list_move_items(FtkWidget* thiz, FtkEvent* event)
 static Ret ftk_list_set_selected(FtkWidget* thiz, FtkWidget* item)
 {
     int index = ftk_list_get_item_index(thiz, item);
-    FtkWidget* old_selected = NULL;
 	DECL_PRIV0(thiz, priv);
     return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
     return_val_if_fail(priv->items_nr > 0, RET_FAIL);
     return_val_if_fail(item != NULL, RET_FAIL);
 
-    if(priv->selected >= 0)
-    {
-        ListItemInfo* info = ftk_list_get_item(thiz, priv->selected);
-        if(info != NULL)
-        {
-            old_selected = info->widget;
-        }
-    }
-
     priv->selected = priv->position + (index - priv->index + priv->items_nr) % priv->items_nr;
 
-    ftk_list_item_set_selected(old_selected, 0);
-    ftk_list_item_set_selected(item, 1);
+    return RET_OK;
+}
+
+static Ret ftk_list_reset_scroll_bar(FtkWidget* thiz)
+{
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+
+    if(priv->scroll_bar != NULL)
+    {
+        ftk_scroll_bar_set_param(priv->scroll_bar, priv->position, priv->total, priv->visible_nr);
+    }
 
     return RET_OK;
 }
@@ -586,12 +549,14 @@ static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
                 {
                     FtkWidget* target = ftk_list_find_target(thiz, x, y);
 
-                    ftk_list_set_selected(thiz, target);
+                    return_val_if_fail(target != NULL, RET_OK);
 
+                    ftk_list_set_selected(thiz, target);
                     ret = FTK_CALL_LISTENER(priv->listener, priv->listener_ctx, thiz);
 
-                    ftk_list_on_item_refresh(thiz, target, 1);
-                    ftk_widget_invalidate(thiz);
+                    ftk_list_on_item_refresh(thiz, target, 1); /* 点击后此item的内容有可能改变，需要刷新一次 */
+                    /* ftk_widget_invalidate(thiz); */
+                    ftk_list_relayout(thiz); /*  */
                 }
             }
 
@@ -674,9 +639,8 @@ Ret ftk_list_set_item_height(FtkWidget* thiz, int item_height)
 Ret ftk_list_init(FtkWidget* thiz, int total, FtkListCallBacks* callbacks)
 {
 	DECL_PRIV0(thiz, priv);
-    int item_height = priv->item_height;
     return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
-    return_val_if_fail(item_height > 0, RET_FAIL);
+    return_val_if_fail(priv->item_height > 0, RET_FAIL);
 
     if(priv->initialized)
     {
@@ -684,8 +648,7 @@ Ret ftk_list_init(FtkWidget* thiz, int total, FtkListCallBacks* callbacks)
     }
 
     priv->y_offset = 0;
-	priv->item_height = item_height;
-    priv->visible_nr = ftk_widget_height(thiz)/item_height;
+    priv->visible_nr = ftk_widget_height(thiz) / priv->item_height;
 
     priv->items_nr = priv->visible_nr * 2;
     priv->item_array = (ListItemInfo*)FTK_ALLOC(sizeof(ListItemInfo) * priv->items_nr);
@@ -701,14 +664,9 @@ Ret ftk_list_init(FtkWidget* thiz, int total, FtkListCallBacks* callbacks)
 
     memcpy(&priv->callbacks, callbacks, sizeof(FtkListCallBacks));
 
-    if(priv->scroll_bar != NULL)
-    {
-        ftk_scroll_bar_set_param(priv->scroll_bar, priv->position, priv->total, priv->visible_nr);
-    }
+    ftk_list_reset_scroll_bar(thiz);
 
     ftk_list_create_items(thiz, priv->items_nr);
-
-    ftk_list_set_selected(thiz, ftk_widget_child(thiz));
 
     ftk_list_relayout(thiz);
 
@@ -751,7 +709,6 @@ Ret ftk_list_set_move_support(FtkWidget* thiz, int support)
 	return RET_OK;
 }
 
-#if  0     /* ----- #if 0 : If0Label_1 ----- */
 Ret ftk_list_set_total(FtkWidget* thiz, int nr)
 {
     DECL_PRIV0(thiz, priv);
@@ -759,10 +716,10 @@ Ret ftk_list_set_total(FtkWidget* thiz, int nr)
 
     priv->total = nr;
 
+    ftk_list_reset_scroll_bar(thiz);
+
     return RET_OK;
 }
-#endif     /* ----- #if 0 : If0Label_1 ----- */
-
 
 Ret ftk_list_page_prev(FtkWidget* thiz)
 {
@@ -830,6 +787,7 @@ Ret ftk_list_reset(FtkWidget* thiz)
     priv->selected = 0;
     priv->y_offset = 0;
 
+    ftk_list_reset_scroll_bar(thiz);
     ftk_list_relayout(thiz);
 
     return RET_OK;
@@ -860,7 +818,8 @@ Ret ftk_list_remove(FtkWidget* thiz, int index)
         if(priv->position >= priv->total)
         {
             priv->position = (priv->position - visible_nr) > 0 ? (priv->position - visible_nr) : 0;
-            /* priv->index = (priv->index - visible_nr + priv->items_nr) % priv->items_nr; */
+            priv->index = (priv->index - visible_nr + priv->items_nr) % priv->items_nr;
+
             priv->selected = priv->position;
         }
         else
@@ -874,8 +833,12 @@ Ret ftk_list_remove(FtkWidget* thiz, int index)
     }
     else
     {
-        priv->position = (priv->position > 0) ? priv->position - 1 : 0;
-        if(priv->position == 0)
+        if(priv->position > 0)
+        {
+            priv->position = priv->position - 1;
+            priv->index = (priv->index - 1 + priv->items_nr) % priv->items_nr;
+        }
+        else
         {
             priv->y_offset = 0;
         }
@@ -883,6 +846,7 @@ Ret ftk_list_remove(FtkWidget* thiz, int index)
         priv->selected = (priv->selected > 0) ? priv->selected - 1 : 0;
     }
 
+    ftk_list_reset_scroll_bar(thiz);
     ftk_list_reset_items(thiz);  
     ftk_list_relayout(thiz);
 
@@ -962,6 +926,17 @@ Ret ftk_list_add_scroll_bar(FtkWidget* thiz, FtkWidget* scroll_bar)
 	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
 
 	priv->scroll_bar = scroll_bar;
+
+	return RET_OK;
+}
+
+Ret ftk_list_refresh(FtkWidget* thiz)
+{
+    DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+
+	ftk_list_reset_items(thiz);
+    ftk_list_relayout(thiz);
 
 	return RET_OK;
 }

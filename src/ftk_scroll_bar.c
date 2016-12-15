@@ -281,7 +281,7 @@ Ret ftk_scroll_bar_set_bitmap(FtkWidget* thiz, FtkBitmap* bitmap)
 Ret ftk_scroll_bar_set_param(FtkWidget* thiz, int value, int max_value, int page_delta)
 {
 	DECL_PRIV0(thiz, priv);
-	return_val_if_fail(priv != NULL, RET_FAIL);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
 	return_val_if_fail(value <= max_value && page_delta <= max_value, RET_FAIL);
 	return_val_if_fail(max_value > 0 && page_delta > 0, RET_FAIL);
 
