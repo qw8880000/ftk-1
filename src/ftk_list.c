@@ -788,6 +788,7 @@ Ret ftk_list_reset(FtkWidget* thiz)
     priv->y_offset = 0;
 
     ftk_list_reset_scroll_bar(thiz);
+	ftk_list_reset_items(thiz);
     ftk_list_relayout(thiz);
 
     return RET_OK;
@@ -935,6 +936,7 @@ Ret ftk_list_refresh(FtkWidget* thiz)
     DECL_PRIV0(thiz, priv);
 	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
 
+    ftk_list_reset_scroll_bar(thiz);
 	ftk_list_reset_items(thiz);
     ftk_list_relayout(thiz);
 

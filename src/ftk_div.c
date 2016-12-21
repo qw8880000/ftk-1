@@ -84,7 +84,7 @@ FtkWidget* ftk_div_create(FtkWidget* parent, int x, int y, int width, int height
 		thiz->on_paint = ftk_div_on_paint;
 		thiz->destroy  = ftk_div_destroy;
 
-		ftk_widget_init(thiz, FTK_DIV, 0, x, y, width, height, FTK_ATTR_INSENSITIVE|FTK_ATTR_BG_FOUR_CORNER);
+		ftk_widget_init(thiz, FTK_DIV, 0, x, y, width, height, FTK_ATTR_INSENSITIVE|FTK_ATTR_TRANSPARENT);
 		ftk_widget_append_child(parent, thiz);
 	}
 	else
