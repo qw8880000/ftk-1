@@ -36,16 +36,16 @@
 
 FTK_BEGIN_DECLS
 
-FtkWidget* ftk_tab_host_create(FtkWidget* parent, int x, int y, int width, int height);
-Ret ftk_tab_host_add_title(FtkWidget* thiz, FtkWidget* title);
-Ret ftk_tab_host_add_page(FtkWidget* thiz, FtkWidget* page);
+FtkWidget* ftk_tab_create(FtkWidget* parent, int x, int y, int width, int height);
+Ret ftk_tab_add_title(FtkWidget* thiz, FtkWidget* title);
+Ret ftk_tab_add_page(FtkWidget* thiz, FtkWidget* page);
 
-Ret ftk_tab_host_click_title(FtkWidget* thiz, FtkWidget* title);
+Ret ftk_tab_click_title(FtkWidget* thiz, FtkWidget* title);
 
-int ftk_tab_host_get_title_index(FtkWidget* thiz, FtkWidget* title);
+int ftk_tab_get_title_index(FtkWidget* thiz, FtkWidget* title);
 
-Ret ftk_tab_host_set_selected_title_by_index(FtkWidget* thiz, int index);
-int ftk_tab_host_get_selected_title_index(FtkWidget* thiz);
+Ret ftk_tab_set_selected_by_index(FtkWidget* thiz, int index);
+int ftk_tab_get_selected_index(FtkWidget* thiz);
 
 FTK_END_DECLS
 

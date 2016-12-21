@@ -83,7 +83,7 @@ FTK_HIDE int FTK_MAIN(int argc, char* argv[])
 	add_page(tab, "General", normal_bitmap, selected_bitmap, 0);
 	add_page(tab, "Graphic", normal_bitmap, selected_bitmap, 1);
     add_page(tab, "Audio", normal_bitmap, selected_bitmap, 2);
-    ftk_tab_set_selected(tab, 0);
+    ftk_tab_set_selected_by_index(tab, 0);
 
 	button = ftk_button_create(win, width/4, height - 50, width/2, 50);
 	ftk_widget_set_text(button, _("Quit")); 

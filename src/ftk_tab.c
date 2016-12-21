@@ -32,7 +32,7 @@
  * 2016-12-01 wangjl <qw8880000@126.com> modify 
  */
 
-#include "ftk_tab_host.h"
+#include "ftk_tab.h"
 #include "ftk_tab_title.h"
 #include "ftk_theme.h"
 #include "ftk_globals.h"
@@ -52,22 +52,22 @@ typedef struct _TabHostPrivInfo
 
 }PrivInfo;
 
-static Ret ftk_tab_host_on_event(FtkWidget* thiz, FtkEvent* event)
+static Ret ftk_tab_on_event(FtkWidget* thiz, FtkEvent* event)
 {
     return RET_OK;
 }
 
-static Ret ftk_tab_host_on_paint(FtkWidget* thiz)
+static Ret ftk_tab_on_paint(FtkWidget* thiz)
 {
     return RET_OK;
 }
 
-static void ftk_tab_host_destroy(FtkWidget* thiz)
+static void ftk_tab_destroy(FtkWidget* thiz)
 {
     return ;
 }
 
-FtkWidget* ftk_tab_host_create(FtkWidget* parent, int x, int y, int width, int height)
+FtkWidget* ftk_tab_create(FtkWidget* parent, int x, int y, int width, int height)
 {
 	FtkWidget* thiz = (FtkWidget*)FTK_ZALLOC(sizeof(FtkWidget));
 	return_val_if_fail(thiz != NULL, NULL);
@@ -78,9 +78,9 @@ FtkWidget* ftk_tab_host_create(FtkWidget* parent, int x, int y, int width, int h
 		DECL_PRIV0(thiz, priv);
         memset(priv, 0, sizeof(PrivInfo));
 
-		thiz->on_event = ftk_tab_host_on_event;
-		thiz->on_paint = ftk_tab_host_on_paint;
-		thiz->destroy  = ftk_tab_host_destroy;
+		thiz->on_event = ftk_tab_on_event;
+		thiz->on_paint = ftk_tab_on_paint;
+		thiz->destroy  = ftk_tab_destroy;
 
 		ftk_widget_init(thiz, FTK_TAB_HOST, 0, x, y, width, height, FTK_ATTR_TRANSPARENT|FTK_ATTR_INSENSITIVE);
 		ftk_widget_append_child(parent, thiz);
@@ -93,7 +93,7 @@ FtkWidget* ftk_tab_host_create(FtkWidget* parent, int x, int y, int width, int h
 	return thiz;
 }
 
-int ftk_tab_host_get_title_index(FtkWidget* thiz, FtkWidget* title)
+int ftk_tab_get_title_index(FtkWidget* thiz, FtkWidget* title)
 {
     int i = 0;
 	DECL_PRIV0(thiz, priv);
@@ -111,21 +111,21 @@ int ftk_tab_host_get_title_index(FtkWidget* thiz, FtkWidget* title)
     return -1;
 }
 
-Ret ftk_tab_host_click_title(FtkWidget* thiz, FtkWidget* title)
+Ret ftk_tab_click_title(FtkWidget* thiz, FtkWidget* title)
 {
 	DECL_PRIV0(thiz, priv);
     return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
     return_val_if_fail(title != NULL, RET_FAIL);
 
-    if(ftk_tab_host_get_title_index(thiz, title) != -1)
+    if(ftk_tab_get_title_index(thiz, title) != -1)
     {
-        ftk_tab_host_set_selected_title_by_index(thiz, ftk_tab_host_get_title_index(thiz, title));
+        ftk_tab_set_selected_by_index(thiz, ftk_tab_get_title_index(thiz, title));
     }
 
     return RET_OK;
 }
 
-Ret ftk_tab_host_add_title(FtkWidget* thiz, FtkWidget* title)
+Ret ftk_tab_add_title(FtkWidget* thiz, FtkWidget* title)
 {
 	DECL_PRIV0(thiz, priv);
 
@@ -138,7 +138,7 @@ Ret ftk_tab_host_add_title(FtkWidget* thiz, FtkWidget* title)
     return RET_OK;
 }
 
-Ret ftk_tab_host_add_page(FtkWidget* thiz, FtkWidget* page)
+Ret ftk_tab_add_page(FtkWidget* thiz, FtkWidget* page)
 {
     DECL_PRIV0(thiz, priv);
 
@@ -151,7 +151,7 @@ Ret ftk_tab_host_add_page(FtkWidget* thiz, FtkWidget* page)
     return RET_OK;
 }
 
-Ret ftk_tab_host_set_selected_title_by_index(FtkWidget* thiz, int index)
+Ret ftk_tab_set_selected_by_index(FtkWidget* thiz, int index)
 {
     int i = 0;
     DECL_PRIV0(thiz, priv);
@@ -187,7 +187,7 @@ Ret ftk_tab_host_set_selected_title_by_index(FtkWidget* thiz, int index)
     return RET_OK;
 }
 
-int ftk_tab_host_get_selected_title_index(FtkWidget* thiz)
+int ftk_tab_get_selected_index(FtkWidget* thiz)
 {
     int i = 0;
 	DECL_PRIV0(thiz, priv);
