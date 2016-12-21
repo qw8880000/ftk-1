@@ -349,7 +349,7 @@ static void		ftk_font_cache_destroy(FtkFont* thiz)
 FtkFont* ftk_font_cache_create (FtkFont* font, int max_glyph_nr)
 {
 	FtkFont* thiz = NULL;
-	int font_height = ftk_font_height(font) + FTK_HEIGHT_ENHANCE;
+	int font_height = ftk_font_height(font) + FONT_HEIGHT_ENHANCE;
 	return_val_if_fail(font != NULL && font_height > 0, NULL);
 
 	if((thiz = FTK_NEW_PRIV(FtkFont)) != NULL)
