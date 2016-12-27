@@ -81,7 +81,6 @@ typedef struct _ListPrivInfo
 
     int visible_nr;
 
-    char* item_style;
     int move_support;
 
     int selected;
@@ -284,7 +283,6 @@ static Ret ftk_list_create_items(FtkWidget* thiz, int nr)
     for(i = 0; i < nr; i++)
     {
         ListItemInfo* item = priv->item_array + i;
-        /* FtkWidget* list_item = ftk_list_style_xul_load(priv->item_style); */
         FtkWidget* list_item = priv->callbacks.get_item(thiz, i, priv->callbacks.get_item_ctx);
 
         if(list_item != NULL)
@@ -713,11 +711,6 @@ static void ftk_list_destroy(FtkWidget* thiz)
         if(priv->item_array != NULL)
         {
             FTK_FREE(priv->item_array);
-        }
-
-        if(priv->item_style != NULL)
-        {
-            FTK_FREE(priv->item_style);
         }
 
 		FTK_ZFREE(priv, sizeof(PrivInfo));
