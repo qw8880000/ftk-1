@@ -1178,33 +1178,6 @@ FtkGc* ftk_widget_get_gc(FtkWidget* thiz)
 	return thiz->priv->gc+thiz->priv->state;
 }
 
-FtkWidget* ftk_widget_find_target_keyboard(FtkWidget* thiz, int x, int y)
-{
-    int left = ftk_widget_left_abs(thiz);
-    int top  = ftk_widget_top_abs(thiz);
-    int w    = ftk_widget_width(thiz);
-    int h    = ftk_widget_height(thiz);
-
-    if(!ftk_widget_is_visible(thiz))
-    {
-        return NULL;
-    }
-
-    if(x < left || y < top || (x > (left + w)) || (y > (top + h)))
-    {
-        return NULL;
-    }
-
-    if(ftk_widget_type(thiz) == FTK_KEY_BOARD)
-    {
-        return thiz;
-    }
-    else
-    {
-        return NULL;
-    }
-}
-
 FtkWidget* ftk_widget_find_target(FtkWidget* thiz, int x, int y, int only_sensitive)
 {
 	FtkWidget* target = NULL;
@@ -1222,20 +1195,6 @@ FtkWidget* ftk_widget_find_target(FtkWidget* thiz, int x, int y, int only_sensit
 	{
 		return NULL;
 	}
-
-    if(thiz->children != NULL)
-    {
-        FtkWidget* iter = thiz->children;
-        while(iter != NULL)
-        {
-            if((target = ftk_widget_find_target_keyboard(iter, x, y)) != NULL)
-            {
-                return target;
-            }
-
-            iter = ftk_widget_next(iter);
-        }
-    }
 
 	if(thiz->children != NULL)
 	{
