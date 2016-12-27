@@ -1181,17 +1181,13 @@ FtkGc* ftk_widget_get_gc(FtkWidget* thiz)
 FtkWidget* ftk_widget_find_target(FtkWidget* thiz, int x, int y, int only_sensitive)
 {
 	FtkWidget* target = NULL;
-	int left = ftk_widget_left_abs(thiz);
-	int top  = ftk_widget_top_abs(thiz);
-	int w    = ftk_widget_width(thiz);
-	int h    = ftk_widget_height(thiz);
 
 	if(!ftk_widget_is_visible(thiz))
 	{
 		return NULL;
 	}
 
-	if(x < left || y < top || (x > (left + w)) || (y > (top + h)))
+    if(!FTK_POINT_IN_WIDGET(x, y, thiz))
 	{
 		return NULL;
 	}
