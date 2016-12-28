@@ -51,10 +51,6 @@
 /*-----------------------------------------------------------------------------
  * terminology 
  *
- *      index    - index of the items
- *      position - index of the data
- *      selected - index of the position which selected
- *      total   - total of data
  *      scrap items - non-visible items
  *      active items - visible items
  *-----------------------------------------------------------------------------*/
@@ -64,19 +60,18 @@ typedef struct _ListPrivInfo
     int initialized;
 
     int y_offset;
+    int total;                                  /* total of data */
+    int position;                               /* index of the data */
+    int selected;                               /* index of the data which selected */
+    int index;                                  /* index of the items */
+
     int item_height;
-    int position;
-    int index;
-    int total;
-
     int items_nr;
-
     int visible_nr;
 
-    int move_support;
-
-    int selected;
     /* FtkWidget* grab_widget; */
+
+    int move_support;
 
     int mouse_pressed;
     int last_mouse_pos;
@@ -84,7 +79,7 @@ typedef struct _ListPrivInfo
     int moved;
 
 	FtkWidget* scroll_bar;
-	
+
 	void* listener_ctx;
 	FtkListener listener;
 

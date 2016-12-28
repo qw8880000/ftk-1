@@ -213,6 +213,12 @@ typedef enum _FtkWrapMode
 	FTK_WRAP_NR
 }FtkWrapMode;
 
+typedef enum _FtkSwitchMethod
+{
+    FTK_SWITCH_BY_TAB,
+    FTK_SWITCH_BY_LEFT_RIGHT,
+    FTK_SWITCH_BY_LRUD,                         /* switch by left,right,up,down */
+}FtkSwitchMethod;
 
 typedef void (*FtkDestroy)(void* user_data);
 typedef Ret  (*FtkIdle)(void* user_data);

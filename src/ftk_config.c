@@ -46,9 +46,39 @@ struct _FtkConfig
 	char data_dir[FTK_MAX_PATH+1];
 	char data_root_dir[FTK_MAX_PATH+1];
 	char test_data_dir[FTK_MAX_PATH+1];
+    FtkSwitchMethod switch_method;
 };
 
 static Ret ftk_config_parse_rotate(FtkConfig* thiz, const char* rotate);
+
+typedef struct _VarConst
+{
+	const char* name;
+	int value;
+}VarConst;
+
+static const VarConst s_var_conts[] =
+{
+    {"FTK_SWITCH_BY_TAB",        FTK_SWITCH_BY_TAB},
+    {"FTK_SWITCH_BY_LEFT_RIGHT", FTK_SWITCH_BY_LEFT_RIGHT},
+    {"FTK_SWITCH_BY_LRUD",       FTK_SWITCH_BY_LRUD},
+
+	{NULL, 0},
+};
+
+static int ftk_config_find_const(const char* name)
+{
+	int i = 0;
+	for(i = 0; s_var_conts[i].name != NULL; i++)
+	{
+		if(strncmp(s_var_conts[i].name, name, strlen(s_var_conts[i].name)) == 0)
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
 
 FtkConfig* ftk_config_create()
 {
@@ -70,6 +100,7 @@ FtkConfig* ftk_config_create()
 
 		thiz->rotate = FTK_ROTATE_0;
 		thiz->enable_status_bar = 1;
+        thiz->switch_method = FTK_SWITCH_BY_TAB;
 	}
 
 	return thiz;
@@ -309,11 +340,16 @@ static void ftk_config_builder_on_start(FtkXmlBuilder* thiz, const char* tag, co
 		ftk_config_parse_rotate(priv->config, attrs[1]);
 		return;
 	}
-	else if(strcmp(tag, "log-level") == 0)
+	else if(strcmp(tag, "log_level") == 0)
 	{
 		ftk_config_set_log_level(attrs[1]);
 		return;
 	}
+    else if(strcmp(tag, "switch_method") == 0)
+    {
+        ftk_config_set_switch_method(priv->config, ftk_config_find_const(attrs[1]));
+        return;
+    }
 
 	return;
 }
@@ -419,6 +455,13 @@ int ftk_config_get_enable_status_bar(FtkConfig* thiz)
 	return thiz->enable_status_bar;
 }
 
+FtkSwitchMethod ftk_config_get_switch_method(FtkConfig* thiz)
+{
+	return_val_if_fail(thiz != NULL, FTK_SWITCH_BY_TAB);
+
+    return thiz->switch_method;
+}
+
 static Ret ftk_config_parse_rotate(FtkConfig* thiz, const char* rotate)
 {
 	int angle = rotate != NULL ? atoi(rotate) : 0;
@@ -486,6 +529,15 @@ Ret ftk_config_set_enable_status_bar(FtkConfig* thiz, int enable_status_bar)
 	thiz->enable_status_bar = enable_status_bar;
 
 	return RET_OK;
+}
+
+Ret ftk_config_set_switch_method(FtkConfig* thiz, FtkSwitchMethod switch_method)
+{
+	return_val_if_fail(thiz != NULL, RET_FAIL);
+
+	thiz->switch_method = switch_method;
+
+    return RET_OK;
 }
 
 void ftk_config_destroy(FtkConfig* thiz)

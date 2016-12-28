@@ -51,12 +51,14 @@ const char* ftk_config_get_test_data_dir(FtkConfig* thiz);
 FtkRotate   ftk_config_get_rotate(FtkConfig* thiz);
 int ftk_config_get_enable_cursor(FtkConfig* thiz);
 int ftk_config_get_enable_status_bar(FtkConfig* thiz);
+FtkSwitchMethod ftk_config_get_switch_method(FtkConfig* thiz);
 
 Ret ftk_config_set_theme(FtkConfig* thiz, const char* theme);
 Ret ftk_config_set_data_dir(FtkConfig* thiz, const char* data_dir);
 Ret ftk_config_set_test_data_dir(FtkConfig* thiz, const char* test_data_dir);
 Ret ftk_config_set_enable_cursor(FtkConfig* thiz, int enable_cursor);
 Ret ftk_config_set_enable_status_bar(FtkConfig* thiz, int enable_status_bar);
+Ret ftk_config_set_switch_method(FtkConfig* thiz, FtkSwitchMethod switch_method);
 
 void ftk_config_destroy(FtkConfig* thiz);
 
