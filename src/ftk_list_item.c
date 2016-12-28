@@ -47,23 +47,12 @@ typedef struct _ListItemPrivInfo
 {
     FtkBitmap* bg_selected;
 
+    int is_scraped;
     int is_selected;
 
 	void* listener_ctx;
 	FtkListener listener;
 }PrivInfo;
-
-Ret ftk_list_item_set_selected(FtkWidget* thiz, int selected)
-{
-	DECL_PRIV0(thiz, priv);
-    return_val_if_fail(thiz != NULL, RET_FAIL);
-
-    priv->is_selected = selected;
-
-    ftk_widget_invalidate(thiz);
-
-    return RET_OK;
-}
 
 static Ret ftk_list_item_on_event(FtkWidget* thiz, FtkEvent* event)
 {
@@ -139,16 +128,6 @@ static Ret ftk_list_item_on_paint(FtkWidget* thiz)
     FTK_END_PAINT();
 }
 
-Ret ftk_list_item_set_bg_selected(FtkWidget* thiz, FtkBitmap* bitmap)
-{
-	DECL_PRIV0(thiz, priv);
-    return_val_if_fail(thiz != NULL && bitmap != NULL, RET_FAIL);
-
-    priv->bg_selected = bitmap;
-
-    return RET_OK;
-}
-
 FtkWidget* ftk_list_item_create(FtkWidget* parent, int x, int y, int width, int height)
 {
 	FtkWidget* thiz = (FtkWidget*)FTK_ZALLOC(sizeof(FtkWidget));
@@ -174,4 +153,56 @@ FtkWidget* ftk_list_item_create(FtkWidget* parent, int x, int y, int width, int 
 
 	return thiz;
 }
+
+Ret ftk_list_item_set_selected(FtkWidget* thiz, int selected)
+{
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL, RET_FAIL);
+
+    priv->is_selected = selected;
+
+    /* ftk_widget_invalidate(thiz); */
+
+    return RET_OK;
+}
+
+int ftk_list_item_is_selected(FtkWidget* thiz)
+{
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL, 0);
+
+    return priv->is_selected;
+}
+
+Ret ftk_list_item_set_scraped(FtkWidget* thiz, int scraped)
+{
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL, RET_FAIL);
+
+    priv->is_scraped = scraped;
+
+    /* ftk_widget_invalidate(thiz); */
+
+    return RET_OK;
+}
+
+int ftk_list_item_is_scraped(FtkWidget* thiz)
+{
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL, 0);
+
+    return priv->is_scraped;
+}
+
+Ret ftk_list_item_set_bg_selected(FtkWidget* thiz, FtkBitmap* bitmap)
+{
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL, RET_FAIL);
+    return_val_if_fail(bitmap != NULL, RET_FAIL);
+
+    priv->bg_selected = bitmap;
+
+    return RET_OK;
+}
+
 
