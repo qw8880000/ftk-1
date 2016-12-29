@@ -22,6 +22,7 @@ FtkWidget* ftk_list_create(FtkWidget* parent, int x, int y, int width, int heigh
 
 Ret ftk_list_set_move_support(FtkWidget* thiz, int support);
 Ret ftk_list_set_total(FtkWidget* thiz, int nr);
+int ftk_list_get_total(FtkWidget* thiz);
 
 Ret ftk_list_set_item_height(FtkWidget* thiz, int item_height);
 Ret ftk_list_init(FtkWidget* thiz, int total, FtkListCallBacks* callbacks);
