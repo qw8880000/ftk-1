@@ -441,7 +441,17 @@ static Ret ftk_list_reset_scroll_bar(FtkWidget* thiz)
 
     if(priv->scroll_bar != NULL)
     {
-        ftk_scroll_bar_set_param(priv->scroll_bar, priv->position, priv->total, priv->visible_nr);
+        if(priv->total <= priv->visible_nr)
+        {
+            ftk_widget_set_visible(priv->scroll_bar, 0);
+            ftk_widget_hide_self(priv->scroll_bar, 1);
+        }
+        else
+        {
+            ftk_widget_set_visible(priv->scroll_bar, 1);
+            ftk_widget_hide_self(priv->scroll_bar, 0);
+            ftk_scroll_bar_set_param(priv->scroll_bar, priv->position, priv->total, priv->visible_nr);
+        }
     }
 
     return RET_OK;
@@ -518,6 +528,96 @@ static Ret ftk_list_dispatch_mouse_event(FtkWidget* thiz, FtkEvent* event)
 }
 #endif
 
+static Ret ftk_list_move_selected(FtkWidget* thiz , int offset)
+{
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+
+    if(priv->total <= 0)
+    {
+        return RET_FAIL;
+    }
+
+    if(priv->selected == 0 && offset < 0)
+    {
+        return RET_FAIL;
+    }
+
+	if((priv->selected + 1) == priv->total && offset > 0)
+    {
+        return RET_FAIL;
+    }
+
+    priv->selected += offset;
+
+	if(priv->selected < 0) priv->selected = 0;
+	if(priv->selected >= priv->total) priv->selected = priv->total - 1;
+
+    if(priv->selected < priv->position)
+	{
+		priv->position = priv->selected;
+	}
+
+	if(priv->selected > (priv->position + priv->visible_nr - 1))
+	{
+		priv->position = priv->selected - (priv->visible_nr - 1);
+	}
+
+    ftk_list_relayout(thiz);
+
+    return RET_REMOVE;
+}
+
+static Ret ftk_list_on_key_event(FtkWidget* thiz, FtkEvent* event)
+{
+	Ret ret = RET_OK;
+	DECL_PRIV0(thiz, priv);
+    return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+    return_val_if_fail(event != NULL, RET_FAIL);
+
+	if(event->type != FTK_EVT_KEY_DOWN){
+        return RET_OK;
+    }
+
+	switch(event->u.key.code)
+	{
+        case FTK_KEY_DOWN:
+        case FTK_KEY_RIGHT:
+		{
+		    ret = ftk_list_move_selected(thiz, 1);
+			break;
+		}
+        case FTK_KEY_LEFT:
+        case FTK_KEY_UP:
+		{
+		    ret = ftk_list_move_selected(thiz, -1);
+			break;
+		}
+		case FTK_KEY_ENTER:
+        {
+            FtkWidget* item = ftk_list_get_item(thiz, priv->index + priv->selected - priv->position);
+            FtkWidget* iter = ftk_widget_child(item);
+            for(; iter != NULL; iter = ftk_widget_next(iter))
+            {
+                if(ftk_widget_is_insensitive(iter) || !ftk_widget_is_visible(iter)
+                        || ftk_widget_has_attr(iter, FTK_ATTR_NO_FOCUS))
+                {
+                    continue;
+                }
+
+                ftk_window_set_focus(ftk_widget_toplevel(iter), iter);
+                ret = RET_REMOVE;
+                break;
+            }
+            break;
+        }
+		default: break;
+	}
+
+	return ret;
+}
+
+
 static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
 {
 	Ret ret = RET_OK;
@@ -528,7 +628,7 @@ static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
 		case FTK_EVT_KEY_UP:
 		case FTK_EVT_KEY_DOWN:
 		{
-			/* ret = ftk_list_view_on_key_event(thiz, event); */
+            ret = ftk_list_on_key_event(thiz, event);
 			break;
 		}
 		case FTK_EVT_MOUSE_UP:
@@ -719,6 +819,14 @@ Ret ftk_list_set_total(FtkWidget* thiz, int nr)
     ftk_list_reset_scroll_bar(thiz);
 
     return RET_OK;
+}
+
+int ftk_list_get_total(FtkWidget* thiz)
+{
+    DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL && priv != NULL, 0);
+
+    return priv->total;
 }
 
 Ret ftk_list_page_prev(FtkWidget* thiz)
