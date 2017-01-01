@@ -881,7 +881,7 @@ Ret ftk_list_reset(FtkWidget* thiz)
     priv->position = 0;
     priv->index = 0;
     priv->total = 0;
-    priv->selected = 0;
+    priv->selected = -1;
     priv->y_offset = 0;
 
     ftk_list_reset_scroll_bar(thiz);
