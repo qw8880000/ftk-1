@@ -60,12 +60,6 @@
  *      active items - visible items
  *-----------------------------------------------------------------------------*/
 
-typedef struct _ListItemInfo
-{
-    int active;
-    FtkWidget* widget;
-}ListItemInfo;
-
 typedef struct _ListPrivInfo
 {
     int initialized;
@@ -77,7 +71,6 @@ typedef struct _ListPrivInfo
     int total;
 
     int items_nr;
-    ListItemInfo* item_array;
 
     int visible_nr;
 
@@ -99,7 +92,6 @@ typedef struct _ListPrivInfo
 
     FtkListCallBacks callbacks;
 }PrivInfo;
-
 
 static FtkWidget* ftk_list_get_item(FtkWidget* thiz, int index)
 {
@@ -175,6 +167,7 @@ static Ret ftk_list_reset_items(FtkWidget* thiz)
         }
 
         ftk_list_item_set_scraped(iter, 1);
+        ftk_list_item_set_selected(iter, 0);
     }
 
     return RET_OK;
@@ -215,12 +208,14 @@ static Ret ftk_list_set_item_active(FtkWidget* thiz, FtkWidget* item)
     return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
     return_val_if_fail(item != NULL, RET_FAIL);
 
-    if(ftk_list_item_is_scraped(item))       /* scrap change to active */
+    /* scrap change to active */
+    if(ftk_list_item_is_scraped(item))       
     {
         ftk_list_item_set_scraped(item, 0);
         ftk_list_on_item_refresh(thiz, item);
     }
 
+    /* set selected */
     position = priv->position + (index - priv->index + priv->items_nr) % priv->items_nr;
     if(priv->selected != position)
     {
@@ -243,6 +238,7 @@ static Ret ftk_list_set_item_scrap(FtkWidget* thiz, FtkWidget* item)
     return_val_if_fail(item != NULL, RET_FAIL);
 
     ftk_list_item_set_scraped(item, 1);
+
     ftk_widget_set_visible(item, 0);
     ftk_widget_hide_self(item, 1);
 
@@ -313,11 +309,13 @@ static Ret ftk_list_move_scroll_bar(FtkWidget* thiz, FtkEvent* event)
 {
 	DECL_PRIV0(thiz, priv);
     return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
-    return_val_if_fail(priv->scroll_bar != NULL, RET_FAIL);
 
-    if(ftk_scroll_bar_get_value(priv->scroll_bar) != priv->position)
+    if(priv->scroll_bar != NULL)
     {
-        ftk_scroll_bar_set_value(priv->scroll_bar, priv->position);
+        if(ftk_scroll_bar_get_value(priv->scroll_bar) != priv->position)
+        {
+            ftk_scroll_bar_set_value(priv->scroll_bar, priv->position);
+        }
     }
 
     return RET_OK;
@@ -719,11 +717,6 @@ static void ftk_list_destroy(FtkWidget* thiz)
 	{
 		DECL_PRIV0(thiz, priv);
 
-        if(priv->item_array != NULL)
-        {
-            FTK_FREE(priv->item_array);
-        }
-
 		FTK_ZFREE(priv, sizeof(PrivInfo));
 	}
 
@@ -755,8 +748,6 @@ Ret ftk_list_init(FtkWidget* thiz, int total, FtkListCallBacks* callbacks)
     priv->visible_nr = ftk_widget_height(thiz) / priv->item_height;
 
     priv->items_nr = priv->visible_nr * 2;
-    priv->item_array = (ListItemInfo*)FTK_ALLOC(sizeof(ListItemInfo) * priv->items_nr);
-    memset(priv->item_array, 0, sizeof(ListItemInfo) * priv->items_nr);
 
     priv->initialized = 1;
     priv->position = 0;
@@ -896,7 +887,7 @@ Ret ftk_list_reset(FtkWidget* thiz)
     priv->position = 0;
     priv->index = 0;
     priv->total = 0;
-    priv->selected = 0;
+    priv->selected = -1;
     priv->y_offset = 0;
 
     ftk_list_reset_scroll_bar(thiz);
@@ -912,6 +903,7 @@ Ret ftk_list_remove(FtkWidget* thiz, int index)
     /* int visible_nr = (priv->y_offset != 0) ? priv->visible_nr + 1 : priv->visible_nr; */
     int visible_nr = priv->visible_nr;
 	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+    return_val_if_fail(index < 0, RET_FAIL);
 
     if(priv->total <= 0)
     {
