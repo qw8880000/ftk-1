@@ -69,8 +69,6 @@ typedef struct _ListPrivInfo
     int items_nr;
     int visible_nr;
 
-    /* FtkWidget* grab_widget; */
-
     int move_support;
 
     int mouse_pressed;
@@ -79,6 +77,8 @@ typedef struct _ListPrivInfo
     int moved;
 
 	FtkWidget* scroll_bar;
+
+    FtkWidget* grab_item;
 
 	void* listener_ctx;
 	FtkListener listener;
@@ -332,15 +332,6 @@ static Ret ftk_list_move_items(FtkWidget* thiz, FtkEvent* event)
     return_val_if_fail(priv->visible_nr > 0, RET_FAIL);
 
     if(priv->total <= 0) {
-        return RET_OK;
-    }
-
-    if(!priv->mouse_pressed){
-        return RET_OK;
-    }
-
-    if(abs(y - priv->last_mouse_pos) < priv->delta)
-    {
         return RET_OK;
     }
 
@@ -643,7 +634,8 @@ static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
             {
                 if(FTK_POINT_IN_WIDGET(x, y, thiz))
                 {
-                    FtkWidget* target = ftk_list_find_target(thiz, x, y);
+                    /* FtkWidget* target = ftk_list_find_target(thiz, x, y); */
+                    FtkWidget* target = priv->grab_item;
 
                     return_val_if_fail(target != NULL, RET_OK);
 
@@ -654,12 +646,17 @@ static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
                     /* ftk_widget_invalidate(thiz); */
                     ftk_list_relayout(thiz);
                 }
+
+                ftk_widget_set_active(priv->grab_item, 0);
+                priv->grab_item = NULL;
             }
 
             break;
         }
 		case FTK_EVT_MOUSE_DOWN:
 		{
+            FtkWidget* target = ftk_list_find_target(thiz, event->u.mouse.x, event->u.mouse.y);
+
             ftk_window_grab(ftk_widget_toplevel(thiz), thiz);
 
             priv->mouse_pressed = 1;
@@ -667,15 +664,25 @@ static Ret ftk_list_on_event(FtkWidget* thiz, FtkEvent* event)
             priv->moved = 0;
 
             /* ftk_list_dispatch_mouse_event(thiz, event); */
+            priv->grab_item = target;
+            ftk_widget_set_active(target, 1);
 
 			break;
 		}
 		case FTK_EVT_MOUSE_MOVE:
         {
-            if(priv->move_support)
+            if(priv->move_support && priv->mouse_pressed)
             {
-                ftk_list_move_scroll_bar(thiz, event);
-                ftk_list_move_items(thiz, event);
+                if(abs(event->u.mouse.y - priv->last_mouse_pos) > priv->delta)
+                {
+                    priv->moved = 1;
+                    ftk_list_move_items(thiz, event);
+                    ftk_list_move_scroll_bar(thiz, event);
+
+                    ftk_widget_set_active(priv->grab_item, 0);
+                    priv->grab_item = NULL;
+                }
+
             }
             break;
         }
@@ -973,28 +980,6 @@ int ftk_list_get_cur_page_num(FtkWidget* thiz)
     return priv->position / priv->visible_nr;
 }
 
-#if 0
-Ret ftk_list_grab(FtkWidget* thiz, FtkWidget* grab_widget)
-{
-    DECL_PRIV0(thiz, priv);
-	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
-
-    priv->grab_widget = grab_widget;
-
-    return RET_OK;
-}
-
-Ret ftk_list_ungrab(FtkWidget* thiz, FtkWidget* grab_widget)
-{
-    DECL_PRIV0(thiz, priv);
-	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
-
-    priv->grab_widget = NULL;
-
-    return RET_OK;
-}
-#endif
-
 Ret ftk_list_set_clicked_listener(FtkWidget* thiz, FtkListener listener, void* ctx)
 {
 	DECL_PRIV0(thiz, priv);
@@ -1012,6 +997,16 @@ int ftk_list_get_selected_position(FtkWidget* thiz)
 	return_val_if_fail(thiz != NULL && priv != NULL, -1);
 
 	return priv->selected;
+}
+
+Ret ftk_list_set_selected_position(FtkWidget* thiz, int position)
+{
+    DECL_PRIV0(thiz, priv);
+	return_val_if_fail(thiz != NULL && priv != NULL, RET_FAIL);
+
+	priv->selected = position;
+
+	return RET_OK;
 }
 
 Ret ftk_list_add_scroll_bar(FtkWidget* thiz, FtkWidget* scroll_bar)
