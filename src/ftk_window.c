@@ -215,6 +215,99 @@ static FtkWidget* ftk_window_find_next_focus(FtkWidget* focus_widget, int move_n
 	return parent;
 }
 
+/* --------------------------------------------------------------------------*/
+/**
+ * @Brief  二叉树的先序遍历
+ *
+ *                  current
+ *                 |       |
+ *                 |       |
+ *                 v       v
+ *                child    next 
+ *
+ * @Param focus_widget
+ *
+ * @Returns   
+ */
+/* ----------------------------------------------------------------------------*/
+static FtkWidget* ftk_window_find_next_by_preorder(FtkWidget* current)
+{
+    FtkWidget* temp = NULL;
+
+    return_val_if_fail(current != NULL, NULL);
+
+    if(!ftk_widget_is_insensitive(current) && ftk_widget_is_visible(current)
+            && !ftk_widget_has_attr(current, FTK_ATTR_NO_FOCUS))
+    {
+        return current;
+    }
+
+    // if current is invisible, don't search the children
+    if(ftk_widget_is_visible(current))
+    {
+        temp = ftk_window_find_next_by_preorder(ftk_widget_child(current));
+        if(temp != NULL)
+        {
+            return temp;
+        }
+    }
+
+    temp = ftk_window_find_next_by_preorder(ftk_widget_next(current));
+    if(temp != NULL)
+    {
+        return temp;
+    }
+
+    return NULL;
+}
+
+static FtkWidget* ftk_window_find_next_focus_ex(FtkWidget* focus_widget)
+{
+    FtkWidget* temp = NULL;
+    FtkWidget* parent = ftk_widget_parent(focus_widget);
+
+    temp = ftk_window_find_next_by_preorder(ftk_widget_child(focus_widget));
+    if(temp != NULL)
+    {
+        return temp;
+    }
+    temp = ftk_window_find_next_by_preorder(ftk_widget_next(focus_widget));
+    if(temp != NULL)
+    {
+        return temp;
+    }
+    temp = ftk_window_find_next_by_preorder(ftk_widget_next(parent));
+    if(temp != NULL)
+    {
+        return temp;
+    }
+
+    return NULL;
+}
+
+static FtkWidget* ftk_window_find_prev_focus_ex(FtkWidget* focus_widget)
+{
+    FtkWidget* window = ftk_widget_toplevel(focus_widget);
+    /* FtkWidget* iter = ftk_widget_child(window); */
+    FtkWidget* iter = ftk_window_find_next_focus_ex(window);
+    FtkWidget* temp = NULL;
+
+    for(; iter != NULL; iter = ftk_window_find_next_focus_ex(iter))
+    {
+        if(iter == focus_widget)
+        {
+            return temp;
+        }
+        else
+        {
+            temp = iter;
+        }
+    }
+
+    return NULL;
+}
+
+
 static Ret ftk_window_on_key_event(FtkWidget* thiz, FtkEvent* event)
 {
 	Ret ret = RET_FAIL;
